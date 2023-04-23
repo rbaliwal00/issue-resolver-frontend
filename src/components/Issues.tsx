@@ -31,9 +31,9 @@ const Issues = () => {
     const navigate = useNavigate();
     const dispatch = useAppDispatch();
 
-        useEffect(() => {
-            refreshIssues();
-        },[]);
+    useEffect(() => {
+        refreshIssues();
+    },[]);
 
         const refreshIssues = () =>{
             retrieveAllIssuesForUserApi(user.id)

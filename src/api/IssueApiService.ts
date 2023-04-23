@@ -14,3 +14,8 @@ export const updateIssueApi = (userId: number, todo:any) => apiClient.put(`/user
 export const deleteIssueApi = (userId: number, id: number) => apiClient.delete(`/users/${userId}/todos/${id}`);
 
 export const createIssueApi = (userId: number, issue:any) => apiClient.post(`/users/${userId}/issues`,issue);
+
+export const getAllExpertsApi = () => apiClient.get(`/experts`);
+
+export const getHomeIssuesApi = () => apiClient.get(`issues/home_issues`);
+

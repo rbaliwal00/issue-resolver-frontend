@@ -17,7 +17,9 @@ interface IssueComponent{
     description: string;
     dateCreated: Date;
     open: boolean;
-    
+    comments: any;
+    assignees: any;
+    votes: any;
 }
 
 interface CommentInterface{
@@ -52,7 +54,6 @@ const IssueComponent = () => {
         }
         createCommentApi(id,comment)
         .then((res) => {
-            console.log(res.data);
             setContent("");
             retrieveComments();
 
@@ -69,6 +70,7 @@ const IssueComponent = () => {
     const retrieveIssue = () =>{
         retrieveIssueNotLoggedIn(id)
         .then((res) => {
+            console.log(res.data)
             setIssue(res.data);
         })
         .catch((error) => {
@@ -79,7 +81,6 @@ const IssueComponent = () => {
     const retrieveComments = () =>{
         retrieveAllCommentsForIssue(id)
         .then((res) => {
-            console.log(res.data)
             setComments(res.data);
         }).catch(err => {
             console.log(err)
@@ -128,12 +129,6 @@ const IssueComponent = () => {
                 <Grid xs={12} sm={5} md={3} className=''>
                     <Typography>opened this issue on {dateFormatter(issue?.dateCreated)}</Typography>
                 </Grid>
-                {/* <Grid xs={12} sm={2} md={1} className=''>
-                    <Typography>0 upvotes</Typography>
-                </Grid>
-                <Grid xs={12} sm={2} md={1} className=''>
-                    <Typography>0 comments</Typography>
-                </Grid> */}
             </Grid>
             
         </Box>
@@ -151,20 +146,20 @@ const IssueComponent = () => {
                             <Button sx={{paddingY:'1px'}} variant='outlined'>
                                 <ArrowUpwardIcon/>
                                 <Box className='ml-2'>
-                                    100
+                                    {issue?.votes.length}
                                 </Box>
                             </Button>
                             <Button sx={{float:'right'}}>
-                                Comments {comments.length}
+                                Comments {issue?.comments.length}
                             </Button>
                         </Box>
-                        {comments.map((comment) => (
+                        {issue?.comments?.map((comment:any) => (
                             <Box className='border rounded-md mb-5' key={comment.id}>
-                            <Box className='pl-3 p-1 border'>{comment.user?.firstName} {comment.user?.lastName}</Box>
-                            <Box>
-                                <Box className='p-3'>{comment.content}</Box>
+                                <Box className='pl-3 p-1 border'>{comment.user?.firstName} {comment.user?.lastName}</Box>
+                                <Box>
+                                    <Box className='p-3'>{comment.content}</Box>
+                                </Box>
                             </Box>
-                        </Box>
                         ))}
                         
                         {user == null ? <Box>
@@ -199,11 +194,13 @@ const IssueComponent = () => {
                     </Box>
                 </Grid>
                 <Grid xs={12} sm={4}>
-                    <Box className='mt-10 p-10'>
+                    <Box className='mt-10 p-2 border-b-2 pb-5'>
                         <Typography sx={{fontWeight:'600'}}>Assignees<SettingsOutlinedIcon sx={{float: 'right'}}/></Typography>
-                        
+                        {issue?.assignees.map((assignee:any) => (
+                            <div>{assignee.email}</div>
+                        ))}
                     </Box>
-                    <Box className='px-10'>
+                    <Box className='px-2 mt-3'>
                         <Typography sx={{fontWeight:'600'}}>Labels<SettingsOutlinedIcon sx={{float: 'right'}}/></Typography>
                     </Box>
                 </Grid>

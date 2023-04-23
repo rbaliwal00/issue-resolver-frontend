@@ -14,6 +14,7 @@ import Issue from './components/Issue';
 import Issues from './components/Issues';
 import AllIssues from './components/NotLoggedIn/Issues';
 import NotLoggedInIssueComponent from './components/NotLoggedIn/IssueComponent';
+import HomePage from './components/HomePage';
 
 
 const AuthenticatedRoutes = ({children}:any) =>{
@@ -46,7 +47,7 @@ function App() {
                         <Route path='/' element={<LoginComponent />}/>
                         <Route path='/login' element={<LoginComponent />}/>
                         <Route path='/signup' element={<SignupComponent />}/>
-                        <Route path='/welcome' element={<IssueComponent/>}/>
+                        <Route path='/welcome' element={<HomePage/>}/>
                         <Route path='/issuecomponent/:id' element={<IssueComponent/>}/>
                         <Route path='/not-logged-in-component/:id' element={<NotLoggedInIssueComponent/>}/>
                         {/* <Route path='/issue/:id' element={<Issue/>}/> */}

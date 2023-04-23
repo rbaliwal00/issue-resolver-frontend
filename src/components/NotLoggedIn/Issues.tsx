@@ -26,7 +26,6 @@ interface Issue{
     description: string;
     dateCreated: Date;
     isOpen: boolean;
-
 }
 
 const Issues = () => {
