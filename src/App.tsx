@@ -21,7 +21,7 @@ const AuthenticatedRoutes = ({children}:any) =>{
   const [user, setUser] = useState<any>(JSON.parse(localStorage.getItem('user-details') || 'null'));
   
   const dispatch = useAppDispatch();
-  const isAutherised = useAppSelector((state) => state.user.auth);
+  const isAutherised = localStorage.getItem('user-details');
   
   useEffect(() => {
 

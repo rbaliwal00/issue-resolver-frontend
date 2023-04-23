@@ -20,12 +20,6 @@ const TitleDescription = (username:any, isOpen:any, date:any) => {
                 <Grid xs={12} sm={5} md={3} className=''>
                     <Typography>opened this issue on {date}</Typography>
                 </Grid>
-                {/* <Grid xs={12} sm={2} md={1} className=''>
-                    <Typography>0 upvotes</Typography>
-                </Grid>
-                <Grid xs={12} sm={2} md={1} className=''>
-                    <Typography>0 comments</Typography>
-                </Grid> */}
             </Grid>
             
         </Box>

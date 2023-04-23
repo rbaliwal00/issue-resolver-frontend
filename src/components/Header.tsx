@@ -12,7 +12,7 @@ import List from '@mui/material/List';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import MenuIcon from '@mui/icons-material/Menu';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { loginApiService, logoutApiService } from '../api/AuthenticationApiService';
 
 import {       
@@ -42,6 +42,7 @@ const drawerWidth = 240;
 
 export default function DrawerAppBar(props: Props) {
   const { window } = props;
+  const location = useLocation();
   const [mobileOpen, setMobileOpen] = React.useState(false);
 
   const [anchorEl, setAnchorEl] = React.useState(null);
@@ -55,8 +56,7 @@ export default function DrawerAppBar(props: Props) {
     setAnchorEl(null);
   };
 
-  // const [user, setUser] = React.useState<any>(JSON.parse(localStorage.getItem('user-details') || 'null'));
-  //   console.log(user);
+  const [user, setUser] = React.useState<any>(localStorage.getItem('user-details'));
   const navigate = useNavigate();
 
 
@@ -87,17 +87,22 @@ export default function DrawerAppBar(props: Props) {
   const isAutherised = useAppSelector((state) => state.user.auth);
   const dispatch = useAppDispatch();
 
+  React.useEffect(() =>{
+    setUser(isAutherised);
+  }, [user]);
+
   const logout = async () =>{
     const response = await logoutApiService();
     if(response.status == 200){
       localStorage.clear();
       dispatch(auth(false));
-      console.log(isAutherised);
+      setUser(null);
+      window.location.reload();
     }
-    // setUser(null);
   }
 
-  // console.log(user);
+  console.log(user);
+  console.log(localStorage.getItem('user-details'));
 
   return (
     <Box sx={{ display: 'flex'}}>
@@ -126,10 +131,10 @@ export default function DrawerAppBar(props: Props) {
                 <Link to="/all-issues" className='tracking-widest hover:text-purple text-stone-500'>Issues</Link>
           </Box>
           <Box sx={{ display: { xs: 'none', sm: 'block', fontSize:'16px', fontWeight: '800'}, mr:'20px'  }}>
-                {isAutherised==false && <Box className='bg-cyan-700' sx={{px:'50px',py:'8px', color:'white', borderRadius:'5px' }}>
+                {isAutherised===false ? <Box className='bg-cyan-700' sx={{px:'50px',py:'8px', color:'white', borderRadius:'5px' }}>
                     <Link to="/login" className='tracking-widest'>LOGIN</Link>
-                </Box>}
-                {isAutherised==true &&                       <div className="home-icon">
+                </Box> : 
+                    <div className="home-icon">
                                  <NotificationsIcon
                                    className="learner-icon bg-cyan-700"
                                    style={{
