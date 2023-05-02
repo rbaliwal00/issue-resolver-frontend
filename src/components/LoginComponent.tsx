@@ -38,6 +38,14 @@ const LoginComponent = () => {
                     email : res.data.email,
                   }))
 
+                  localStorage.setItem('user-role', JSON.stringify({
+                    role : res.data.role,
+                  }))
+
+                  localStorage.setItem('username', JSON.stringify({
+                    name : res.data.firstName + " " + res.data.lastName,
+                  }))
+
                 apiClient.interceptors.request.use(
                     (config) => {
                         console.log('intercepting and adding a token')
@@ -66,20 +74,20 @@ const LoginComponent = () => {
         <form onSubmit={handleSumbit} >
             <Box sx={{mt:'50px', mb:'30px'}} className='px-10'>
                 <TextField
-                label="Username"
-                value={email}
-                onChange={(e)=> setEmail(e.target.value)}
-                type="text"
-                className='w-full  md:w-96 '
+                    label="Username"
+                    value={email}
+                    onChange={(e)=> setEmail(e.target.value)}
+                    type="text"
+                    className='w-full  md:w-96 '
                 />
             </Box>
             <Box sx={{mt:'50px', mb:'30px'}} className='px-10'>
                 <TextField
-                label="Password"
-                type="password"
-                className='w-full md:w-96'
-                value={password}
-                onChange={(e)=> setPassword(e.target.value)}
+                    label="Password"
+                    type="password"
+                    className='w-full md:w-96'
+                    value={password}
+                    onChange={(e)=> setPassword(e.target.value)}
                 />
             </Box>
             <button 

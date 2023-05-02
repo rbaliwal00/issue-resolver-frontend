@@ -1,19 +1,20 @@
 import React, { useState, useEffect } from 'react';
 import Grid from '@mui/material/Unstable_Grid2';
 import { Box, Button, TextField, Typography } from '@mui/material';
-import TitleDescription from '../atoms/TitleDescription';
-import { margin } from '@mui/system';
 import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
 import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAppSelector } from '../redux/app/hooks';
-import { getAllExpertsApi, retrieveIssueApi } from '../api/IssueApiService';
+import { addAssigneeApi, getAllExpertsApi, retrieveIssueApi, upvoteApi } from '../api/IssueApiService';
 import Modal from '@mui/material/Modal';
 import Autocomplete from '@mui/material/Autocomplete';
 import { createCommentApi, retrieveAllCommentsForIssue } from '../api/CommentApiService';
+import UpvoteButton from '../molecules/UpvoteButton';
+import GenericButton from '../molecules/GenericButton';
+import CommentBox from '../molecules/CommentBox';
 
 interface IssueComponent{
-    id: string;
+    id: number;
     title: string
     user: any;
     description: string;
@@ -45,7 +46,8 @@ const IssueComponent = () => {
 
     const id = useAppSelector((state) => state.issue.id);
     const [user, setUser] = useState<any>(JSON.parse(localStorage.getItem('user-id') || 'null'));
-    const [message, setMessgae] = useState<string|null>(null);
+    const username = JSON.parse(localStorage.getItem('user-email') || 'null');
+
     const [assigneeSelected, setAssigneeSelected] = useState<string | null>("");
     const[content, setContent] = useState("");
     const [assignees, setAssignees] = useState<Assignee[] | []>([]);
@@ -68,6 +70,8 @@ const IssueComponent = () => {
         retrieveComments();
     },[]);
 
+    useEffect(() => {
+    },[user]);
 
     const retrieveIssue = () =>{
         retrieveIssueApi(user.id, id)
@@ -77,7 +81,7 @@ const IssueComponent = () => {
         .catch((error) => {
 
         })
-    }
+    }   
 
     const retrieveAssignees = () =>{
         getAllExpertsApi()
@@ -108,9 +112,18 @@ const IssueComponent = () => {
       };
 
     const handleSubmit = () =>{
-        console.log(assigneeSelected);
-        setAssigneeSelected(null);
-        setOpen(false);
+        if(assigneeSelected!== null){
+            addAssigneeApi(assigneeSelected, id)
+            .then((res) => {
+                console.log(res.data)
+                retrieveIssue();
+            }).catch(err => {
+                console.log(err)
+            });
+    
+            setAssigneeSelected(null);
+            setOpen(false);
+        }
     }
 
     const retrieveComments = () =>{
@@ -127,18 +140,33 @@ const IssueComponent = () => {
         const comment = {
             content: content
         }
-        createCommentApi(id,comment)
+        createCommentApi(user.id,id,comment)
         .then((res) => {
             setContent("");
             retrieveIssue();
         })
         .catch(err => console.log(issue));
     }
+
+    const handleClick = () =>{
+        setUser(JSON.parse(localStorage.getItem('user-id') || 'null'));
+        if(!user){
+            navigate('/login')
+            return;
+        }
+        upvoteApi(user.id, id)
+        .then((res) => {
+            console.log(res.data)
+            retrieveIssue();
+        }).catch(err => {
+            console.log(err)
+        });
+    }
   
     return (
         <Box className='w-10/12 m-auto'>
             <Box className='border-b p-2'>
-                <Box className='text-3xl font-bold font-sans'>
+                <Box className='text-3xl font-bold font-mono'>
                     {issue?.title}
                     <Box className='bg-green-800 text-white rounded-md'
                         sx={{
@@ -164,31 +192,25 @@ const IssueComponent = () => {
                     </Box>
                 </Box>
 
-                <Box className='pt-6 pl-2'>
+                <Box className='pt-6'>
             <Grid container spacing={2} >
                 <Grid xs={12} md={1} className='mr-2'>
-                {issue?.open ? <Button variant='contained'
-                            color='success'
-                            sx={{borderRadius: '18px', paddingX:'20px', fontSize:'14px', paddingY:'3px'}}>Open
-                    </Button> : <Button variant='contained'
-                            color='primary'
-                            sx={{borderRadius: '18px', paddingX:'20px', fontSize:'14px', paddingY:'3px'}}>
-                        Closed
-                    </Button>}
-                    
+                    <button
+                            className='text-white'
+                                style={{borderRadius: '18px',
+                                fontSize:'14px'}}>
+                            {issue?.open ?
+                                <p className='px-4 py-1 bg-green-700 rounded-2xl'>Open</p> : 
+                                <p className='px-4 py-1 bg-rose-700 rounded-2xl'>Closed</p>
+                            }
+                    </button>
                 </Grid>
-                <Grid xs={12} sm={2} md={1} className='mr-10' >
+                <Grid xs={12} sm={2} md={2} className='mr-10' >
                     <Typography>{issue?.user?.email}</Typography>
                 </Grid>
                 <Grid xs={12} sm={5} md={3} className=''>
                     <Typography>opened this issue on {dateFormatter(issue?.dateCreated)}</Typography>
                 </Grid>
-                {/* <Grid xs={12} sm={2} md={1} className=''>
-                    <Typography>0 upvotes</Typography>
-                </Grid>
-                <Grid xs={12} sm={2} md={1} className=''>
-                    <Typography>0 comments</Typography>
-                </Grid> */}
             </Grid>
             
         </Box>
@@ -196,31 +218,19 @@ const IssueComponent = () => {
             <Grid container spacing={2} >
                 <Grid xs={12} sm={8} className='m-auto mt-8'>
                     <Box>
-                        <Box className='font-black text-lg pl-2'>Description</Box>
+                        <Box className='font-black text-lg pl-2 mt-6'>Description</Box>
                         <Box className='border rounded-md p-2' sx={{ m: 1, width: '80%' }}>
                             {issue?.description}
                         </Box>
                     </Box>
                     <Box sx={{width: '80%'}}>
-                        <Box className='p-2'>
-                            <Button sx={{paddingY:'1px'}} variant='outlined'>
-                                <ArrowUpwardIcon/>
-                                <Box className='ml-2'>
-                                {issue?.votes.length}
-                                </Box>
-                            </Button>
-                            <Button sx={{float:'right'}}>
-                                Comments {issue?.comments.length}
-                            </Button>
+                        <Box className='py-4'>
+                            <span onClick={() => handleClick(issue?.id)}><UpvoteButton value={issue?.votes.length}/></span>
+                            <span className='float-right'><GenericButton text={`Comments ${issue?.comments.length}`}/></span>
                         </Box>
                         
                         {issue?.comments?.map((comment:any) => (
-                            <Box className='border rounded-md mb-5' key={comment.id}>
-                                <Box className='pl-3 p-1 border'>{comment.user?.firstName} {comment.user?.lastName}</Box>
-                                <Box>
-                                    <Box className='p-3'>{comment.content}</Box>
-                                </Box>
-                            </Box>
+                            <CommentBox id={issue.id} user={comment.user} content={comment.content}/>
                         ))}
                         
                         {user == null ? <Box>
@@ -228,25 +238,23 @@ const IssueComponent = () => {
                             </Box>:
                             <form className='mt-10'>
                             <Box className='border rounded-md'>
-                                <Box className='pl-3 p-1'>username</Box>
+                                <Box className='pl-3 p-1 bg-sky-100 font-semibold'>
+                                    <span style={{marginLeft:'10px'}}>{issue?.user?.firstName.toLowerCase()} {issue?.user?.lastName.toLowerCase()}</span>
+                                </Box>
                                 <Box>
                                     <TextField rows={2} multiline 
                                     placeholder='Leave a comment' sx={{ width: '100%' }} 
                                     value={content} onChange={(e) => setContent(e.target.value)}>
                                     </TextField>
+                                    <Box onClick={addComment} 
+                                        style={{textAlign: 'center',
+                                            marginTop: '10px',
+                                            marginBottom: '10px',
+                                            cursor: 'pointer'}}>
+                                        <GenericButton text='Comment'/>
+                                    </Box>
                                 </Box>
-                                <Box className='bg-green-800 text-white rounded-md'
-                                    sx={{
-                                    paddingX:'25px',
-                                    paddingY:'4px',
-                                    fontSize:'14px', 
-                                    float: 'right',
-                                    marginLeft:'20px',
-                                    cursor:'pointer'
-                                    }}        
-                                    onClick={addComment}>
-                                        Comment
-                                </Box>
+                                
                             </Box>
                         </form>
                         }
@@ -255,12 +263,14 @@ const IssueComponent = () => {
                 <Grid xs={12} sm={4}>
                     <Box className='mt-10 p-2 border-b-2'>
                         <Typography sx={{fontWeight:'600'}}>Assignees<SettingsOutlinedIcon sx={{float: 'right'}} onClick={handleOpen} /></Typography>
-                        <Typography>No one {issue?.user.id === user.id && <span> - assign yourself</span>}</Typography> 
+                        {issue?.assignees.length === 0 && issue?.user.role === 'EXPERT' && <Typography onClick={handleOpen}>No one yet! Assign Someone</Typography> }
+                        {issue?.assignees.map((assignee:any) => (
+                            <div>{assignee.email}</div>
+                        ))}
                     </Box>
-                    <Box className='px-2 mt-5'>
+                    {/* <Box className='px-2 mt-5'>
                         <Typography sx={{fontWeight:'600'}}>Labels<SettingsOutlinedIcon sx={{float: 'right'}}/></Typography>
-                        
-                    </Box>
+                    </Box> */}
                 </Grid>
             </Grid>
             <Modal
@@ -287,7 +297,6 @@ const IssueComponent = () => {
               
             }}
             value={assigneeSelected}
-            
           />
         )}
         onChange={(event:any, newValue: string | null)=> setAssigneeSelected(newValue)}

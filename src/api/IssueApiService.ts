@@ -19,3 +19,13 @@ export const getAllExpertsApi = () => apiClient.get(`/experts`);
 
 export const getHomeIssuesApi = () => apiClient.get(`issues/home_issues`);
 
+export const getAssignedIssuesApi = (userId: number) => apiClient.get(`users/${userId}/issues/assigned_issues`);
+
+export const upvoteApi = (userId: number, issueId:number) => apiClient.post(`/upvote/user/${userId}/issues/${issueId}`);
+
+export const addAssigneeApi = (email: String, issueId:number) => apiClient.post(`/users/${email}/issues/${issueId}/assignee`);
+
+export const closeIssueApi = (issueId:number) => apiClient.post(`/users/issues/${issueId}/close_issue`);
+
+
+

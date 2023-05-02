@@ -42,6 +42,14 @@ const SignupComponent = () => {
                     email : res.data.email,
                   }))
 
+                  localStorage.setItem('user-role', JSON.stringify({
+                    role : res.data.role,
+                  }))
+
+                  localStorage.setItem('username', JSON.stringify({
+                    name : res.data.firstName + " " + res.data.lastName,
+                  }))
+
                 apiClient.interceptors.request.use(
                     (config) => {
                         console.log('intercepting and adding a token')

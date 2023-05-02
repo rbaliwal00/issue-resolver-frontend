@@ -19,7 +19,7 @@ const TitleDescription = (username:any, isOpen:any, date:any) => {
                 </Grid>
                 <Grid xs={12} sm={5} md={3} className=''>
                     <Typography>opened this issue on {date}</Typography>
-                </Grid>
+                </Grid> 
             </Grid>
             
         </Box>

@@ -6,7 +6,6 @@ import { useAppDispatch, useAppSelector } from './redux/app/hooks';
 import DrawerAppBar from './components/Header';
 import LoginComponent from './components/LoginComponent';
 import SignupComponent from './components/SignupComponent';
-import WelcomeComponent from './components/WelcomeComponent';
 import LogoutComponent from './components/LogoutComponent';
 import ErrorComponent from './components/ErrorComponent';
 import IssueComponent from './components/IssueComponent';
@@ -15,6 +14,8 @@ import Issues from './components/Issues';
 import AllIssues from './components/NotLoggedIn/Issues';
 import NotLoggedInIssueComponent from './components/NotLoggedIn/IssueComponent';
 import HomePage from './components/HomePage';
+import AssignedIssues from './components/AssignedIssues';
+// import './App.css';
 
 
 const AuthenticatedRoutes = ({children}:any) =>{
@@ -53,9 +54,11 @@ function App() {
                         {/* <Route path='/issue/:id' element={<Issue/>}/> */}
                         <Route path='/issues' element={<Issues/>}/>
                         <Route path='/all-issues' element={<AllIssues/>}/>
-                        <Route path='/logout' element={
-                            <AuthenticatedRoutes><LogoutComponent/></AuthenticatedRoutes>
+                        <Route path='/assigned-issues' element={
+                            <AuthenticatedRoutes><AssignedIssues /></AuthenticatedRoutes>
                         }/>
+                        <Route path='/logout' element={
+                            <LogoutComponent/>}/>
                         <Route path='/issue/:id' element={
                             <AuthenticatedRoutes><Issue/></AuthenticatedRoutes>
                         }/>

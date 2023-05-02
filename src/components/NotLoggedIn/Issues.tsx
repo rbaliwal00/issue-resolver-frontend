@@ -58,7 +58,7 @@ const Issues = () => {
         const refreshIssues = () =>{
             retrieveAllIssues(page)
             .then(res => {
-                console.log(page);
+                console.log(res.data);
                 setIssues(res.data.content);
                 setNumberOfPages(res.data.totalPage)
                 setIssueContent({
@@ -110,7 +110,7 @@ const Issues = () => {
         <Box>
 
         
-        <div className='md:w-10/12 m-auto'>
+        <div className='md:w-10/12 m-auto '>
             <h1 className='text-4xl text-white font-black'>
                 Things You Want To Do!
             </h1>
@@ -161,12 +161,19 @@ const Issues = () => {
                     marginBottom: '30px'}}>New Issue</Button>
             
         </div>
-        <Box className='absolute bottom-0  p-6 bg-cyan-700 w-full place-content-center'>
-                <Pagination 
-                    count={issueContent.totalPage} 
-                    size="medium" 
-                    onChange={handleChange} 
-                    className=''/>
+        <Box className='absolute bottom-0  p-6 bg-slate-100 w-10/12 text-white'
+            style={{left: '0', right: '0', marginLeft: 'auto', marginRight: 'auto'}}>
+                <Box className='w-1/2 m-auto'>
+                    <Pagination 
+                        count={issueContent.totalPage} 
+                        size="large" 
+                        shape="rounded"
+                        
+                        sx={{text:'white', color: 'white'}}
+                        onChange={handleChange} 
+                        className='text-white'
+                        style={{color: 'white'}}/>
+                </Box>
             </Box>
         </Box>
     )

@@ -97,12 +97,9 @@ export default function DrawerAppBar(props: Props) {
       localStorage.clear();
       dispatch(auth(false));
       setUser(null);
-      window.location.reload();
+      navigate('/logout');
     }
   }
-
-  console.log(user);
-  console.log(localStorage.getItem('user-details'));
 
   return (
     <Box sx={{ display: 'flex'}}>
@@ -123,8 +120,9 @@ export default function DrawerAppBar(props: Props) {
             sx={{display: { xs: 'none', sm: 'block' }, marginRight: '80px', marginLeft:'120px',color:'#0886CA' }}
           >
             <a href="https://www.rajanbaliwal.me" className='tracking-widest font-bold text-3xl font-mono'>
-              <span className='text-red-600'>Rajan</span> 
-              <span className='text-stone-700'> Baliwal</span></a>
+              <span className='text-cyan-700'>I</span> 
+              <span className='text-cyan-300'>-</span>
+              <span className='text-stone-700'>Tracker</span></a>
           </Typography>
           <Box sx={{ display: { xs: 'none', sm: 'block', fontSize:'18px', fontWeight: '800'},flexGrow: 1 }}>
                 <Link to={`/welcome`} className='tracking-widest mr-10 text-stone-500'>Home</Link>
@@ -202,6 +200,14 @@ export default function DrawerAppBar(props: Props) {
                                          <GroupIcon fontSize="small" />
                                        </ListItemIcon>
                                         My Issues
+                                     </Link>
+                                   </MenuItem>
+                                   <MenuItem>
+                                     <Link to="/assigned-issues">
+                                       <ListItemIcon>
+                                         <GroupIcon fontSize="small" />
+                                       </ListItemIcon>
+                                        Assigned
                                      </Link>
                                    </MenuItem>
                                    <MenuItem onClick={logout}>
