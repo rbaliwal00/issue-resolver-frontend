@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from 'react';
-import { Box, Button, TextField, Typography, Grid } from '@mui/material';
+import { Box, Button, TextField, Typography, Grid, Alert, Snackbar } from '@mui/material';
 import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
 import { getHomeIssuesApi, upvoteApi } from '../api/IssueApiService';
 import { createTheme } from '@mui/material/styles';
@@ -8,7 +8,9 @@ import { ThemeProvider } from 'react-bootstrap';
 import UpvoteButton from '../molecules/UpvoteButton';
 import CommentBox from '../molecules/CommentBox';
 import GenericButton from '../molecules/GenericButton';
-
+import { Link, useNavigate } from 'react-router-dom';
+import { useAppDispatch } from '../redux/app/hooks';
+import { settingIssueId } from '../redux/issue/issueSlice';
 interface Issue{
     id: number;
     title: string
@@ -35,6 +37,12 @@ const HomePage = () => {
     const [issues, setIssues] = useState<Issue[] | []>([]);
 
     const [user, setUser] = useState<any>(JSON.parse(localStorage.getItem('user-id') || 'null'));
+    const [message, setMessgae] = useState<string | null>(null);
+    const [liked, setLiked] = useState(false);
+
+    const dispatch = useAppDispatch();
+
+    const navigate = useNavigate();
 
     useEffect(() => {
         refreshIssues();
@@ -56,6 +64,8 @@ const HomePage = () => {
     const handleClick = (id: number) =>{
         setUser(JSON.parse(localStorage.getItem('user-id') || 'null'));
         if(!user){
+            setMessgae('Login to Upvote an Issue');
+            setOpen(true);
             return;
         }
         upvoteApi(user.id, id)
@@ -67,20 +77,41 @@ const HomePage = () => {
         });
     }
 
-    console.log(issues[0]?.id)
+    const [open, setOpen] = React.useState(false);
+  
+    const handleClose = (event?: React.SyntheticEvent | Event, reason?: string) => {
+      if (reason === 'clickaway') {
+        return;
+      }
+  
+      setOpen(false);
+    };
+
+    const handleTitleClick = (id: number) =>{
+        dispatch(dispatch(settingIssueId(id)));
+        navigate(`/not-logged-in-component/${id}`);
+    }
 
     return (
         <ThemeProvider theme={theme}>
             <Box className='w-11/12 m-auto'>
+                <Snackbar open={open} autoHideDuration={2000} onClose={handleClose}>
+                    <Alert onClose={handleClose} severity="error" sx={{ width: '100%' }}>
+                        {message}
+                    </Alert>
+                </Snackbar>
                 <Typography 
-                    className='pb-4 text-center text-teal-800' 
+                    className='pb-4 text-center' 
                     variant='h4' 
                     style={{fontWeight: 'bold', color: ''}}>Top Issues</Typography>
                 {issues.length > 0 && <Grid container columnSpacing={2}>
-                    <Grid item xs={7} className='border rounded-md' style={{boxShadow: '0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24)'}}>
+                    <Grid item xs={7} className='border rounded-md' 
+                        style={{boxShadow: '0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24)', background: 'white'}}>
                         <Box className=''  minHeight='500px'>
-                            <Box className='text-2xl font-bold font-sans text-center mb-2 mt-4'>
-                                {issues[0]?.title}
+                            <Box className='text-2xl font-bold font-sans text-center mb-2 mt-4' 
+                                onClick={() => handleTitleClick(issues[0].id)}
+                                sx={{pointer: 'cursor'}}>
+                                <button>{issues[0]?.title}</button>
                             </Box>
                             <Box className='pl-2 mb-2'>
                                 <Grid container spacing={2} className='p-2 mt-2'>
@@ -97,11 +128,12 @@ const HomePage = () => {
                             </Box>
                             <Box>
                                 <Box className='p-2'>
-                                    <span onClick={() => handleClick(issues[0].id)}><UpvoteButton value={issues[0].votes.length}/></span>
+                                    <span onClick={() => handleClick(issues[0].id)}><UpvoteButton value={issues[0].votes.length} />
+                                    </span>
                                     <span className='float-right'><GenericButton text={`Comments ${issues[0]?.comments.length}`}/></span>
                                 </Box>
                             </Box>
-                            <Box className='mt-4' maxHeight={'250px'} style={{overflowY: 'scroll'}}> 
+                            <Box className='mt-4 mr-2' maxHeight={'250px'} style={{overflowY: 'scroll'}}> 
                                 {issues[0]?.comments?.map((comment:any) => (
                                     <CommentBox id={comment.id} user={comment.user} content={comment.content}/>
                                 ))}
@@ -110,11 +142,13 @@ const HomePage = () => {
                     </Grid>
                     <Grid item xs={5} spacing={2} >
                         <Grid item xs={12} className='border rounded-md p-2' minHeight='250px' 
-                            style={{boxShadow: '0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24)'}}>
+                            style={{boxShadow: '0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24)', background: 'white'}}>
                             <Box className='p-2'>
-                                <Box className='text-2xl font-bold font-sans text-center mt-2 mb-4'>
-                                    {issues[1]?.title}
-                                </Box>
+                            <Box className='text-2xl font-bold font-sans text-center mb-4' 
+                                onClick={() => handleTitleClick(issues[1].id)}
+                                sx={{pointer: 'cursor'}}>
+                                <button>{issues[1]?.title}</button>
+                            </Box>
                                 <Box className='pl-2 mb-2'>
                                     <Grid container spacing={2} className=''>
                                         <Grid xs={12} sm={2} md={6} className='' >
@@ -138,10 +172,12 @@ const HomePage = () => {
                             </Box>
                         </Grid>
                         <Grid item xs={12} className='border rounded-md' minHeight='250px'
-                            style={{boxShadow: '0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24)', marginTop: '10px'}}>
+                            style={{boxShadow: '0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24)',background: 'white', marginTop: '10px'}}>
                             <Box className='p-2'>
-                                <Box className='text-2xl font-bold font-sans text-center mt-2 mb-4'>
-                                    {issues[2]?.title}
+                                <Box className='text-2xl font-bold font-sans text-center mt-2 mb-4' 
+                                    onClick={() => handleTitleClick(issues[2].id)}
+                                    sx={{pointer: 'cursor'}}>
+                                    <button>{issues[2]?.title}</button>
                                 </Box>
                                 <Box className='pl-2 pb-4 mb-2'>
                                     <Grid container spacing={2} className=''>
@@ -167,7 +203,9 @@ const HomePage = () => {
                         </Grid>
                     </Grid>
                 </Grid>}
+      
             </Box>
+  
         </ThemeProvider>
     );
 };

@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { useAppDispatch, useAppSelector } from '../redux/app/hooks';
-import { auth, saveUsername } from '../redux/user/userSlice';
+import { auth, saveRole, saveUsername } from '../redux/user/userSlice';
 
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
@@ -57,6 +57,7 @@ export default function DrawerAppBar(props: Props) {
   };
 
   const [user, setUser] = React.useState<any>(localStorage.getItem('user-details'));
+  const [userrole, setUserRole] = React.useState<any>(localStorage.getItem('user-role'));
   const navigate = useNavigate();
 
 
@@ -85,21 +86,25 @@ export default function DrawerAppBar(props: Props) {
   const container = window !== undefined ? () => window().document.body : undefined;
 
   const isAutherised = useAppSelector((state) => state.user.auth);
+  const role = useAppSelector((state) => state.user.role);
   const dispatch = useAppDispatch();
 
   React.useEffect(() =>{
     setUser(isAutherised);
-  }, [user]);
+  }, [user, userrole]);
 
   const logout = async () =>{
     const response = await logoutApiService();
     if(response.status == 200){
       localStorage.clear();
       dispatch(auth(false));
+      dispatch(saveRole(null));
       setUser(null);
       navigate('/logout');
     }
   }
+
+  console.log(isAutherised)
 
   return (
     <Box sx={{ display: 'flex'}}>
@@ -119,7 +124,7 @@ export default function DrawerAppBar(props: Props) {
             component="div"
             sx={{display: { xs: 'none', sm: 'block' }, marginRight: '80px', marginLeft:'120px',color:'#0886CA' }}
           >
-            <a href="https://www.rajanbaliwal.me" className='tracking-widest font-bold text-3xl font-mono'>
+            <a href="/" className='tracking-widest font-bold text-3xl font-mono'>
               <span className='text-cyan-700'>I</span> 
               <span className='text-cyan-300'>-</span>
               <span className='text-stone-700'>Tracker</span></a>
@@ -129,8 +134,9 @@ export default function DrawerAppBar(props: Props) {
                 <Link to="/all-issues" className='tracking-widest hover:text-purple text-stone-500'>Issues</Link>
           </Box>
           <Box sx={{ display: { xs: 'none', sm: 'block', fontSize:'16px', fontWeight: '800'}, mr:'20px'  }}>
-                {isAutherised===false ? <Box className='bg-cyan-700' sx={{px:'50px',py:'8px', color:'white', borderRadius:'5px' }}>
-                    <Link to="/login" className='tracking-widest'>LOGIN</Link>
+                {isAutherised===false || isAutherised === null ? <Box className='bg-cyan-700' sx={{px:'50px',py:'8px', color:'white', borderRadius:'5px' }}>
+                    <Link to="/login" className='tracking-widest hover:text-black' 
+                    style={{textDecoration:"none"}}>LOGIN</Link>
                 </Box> : 
                     <div className="home-icon">
                                  <NotificationsIcon
@@ -202,14 +208,14 @@ export default function DrawerAppBar(props: Props) {
                                         My Issues
                                      </Link>
                                    </MenuItem>
-                                   <MenuItem>
+                                   {role === 'EXPERT' && <MenuItem>
                                      <Link to="/assigned-issues">
                                        <ListItemIcon>
                                          <GroupIcon fontSize="small" />
                                        </ListItemIcon>
                                         Assigned
                                      </Link>
-                                   </MenuItem>
+                                   </MenuItem>}
                                    <MenuItem onClick={logout}>
                                      <ListItemIcon>
                                        <Logout fontSize="small" />

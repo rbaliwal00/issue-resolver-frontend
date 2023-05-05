@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Box, Button } from '@mui/material';
 import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
 
@@ -20,7 +20,7 @@ const UpvoteButton = ({value}: UpvoteProps) => {
                     cursor: 'pointer'}}>
                 <span className='mr-1'><ArrowUpwardIcon /></span>
                 <span>{value}</span>
-            </span>  
+            </span>
         </span>
     );
 };

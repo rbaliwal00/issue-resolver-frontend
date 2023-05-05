@@ -35,6 +35,10 @@ const Issues = () => {
     const [message, setMessgae] = useState<string|null>(null);
     const [page, setPage] = useState(0);
     const [numberOfPages, setNumberOfPages] = useState(5);
+
+    const [query, setQuery] = useState("");
+    console.log(issues.filter(issue=> issue.title.includes("Assi")))
+
     const [issueContent, setIssueContent] = useState({
         content: [],
         totalPage: 0,
@@ -53,12 +57,11 @@ const Issues = () => {
 
         useEffect(() => {
             refreshIssues();
-        },[page]);
+        },[page, query]);
 
         const refreshIssues = () =>{
-            retrieveAllIssues(page)
+            retrieveAllIssues(page, query)
             .then(res => {
-                console.log(res.data);
                 setIssues(res.data.content);
                 setNumberOfPages(res.data.totalPage)
                 setIssueContent({
@@ -108,12 +111,30 @@ const Issues = () => {
 
     return (
         <Box>
-
-        
-        <div className='md:w-10/12 m-auto '>
-            <h1 className='text-4xl text-white font-black'>
-                Things You Want To Do!
-            </h1>
+            <div className='md:w-10/12 m-auto '>
+                <h1 className='text-4xl text-gray-800 text-center mt-4 mb-6 font-black'>
+                    All Issues
+                </h1>
+            <div className="filter mt-10 mb-10">
+                <div className="hidden md:block">
+                    <div className="md:w-2/3 shadow-lg  mx-auto flex flex-wrap items-stretch  border-0 md:border-2 border-neutral-300 rounded-lg">
+                        <div className="md:w-9/12">          
+                            <input type="text" id="filter-input"
+                                className="w-full border-2 md:border-2 border-slate-300  box-content shadow-none outline-0 rounded-lg px-5 text-black-400 font-semibold -z-10 h-full"
+                                // onKeyDown={function(e){if (e.key === 'Enter') setFilterValue((e.target as any).value)}}
+                                onChange={(e)=> setQuery(e.target.value)}
+                            />
+                        </div>
+                        <button
+                        type='submit'
+                        className='w-full bg-cyan-800 scale-110 text-sm font-bold md:w-3/12 px-5 py-2 md:px-auto text-white rounded-lg'    
+                        // onClick={()=>setFilterValue((document.getElementById('filter-input') as HTMLInputElement)?.value as string)}
+                        >
+                        Search
+                        </button>
+                    </div>
+                </div>
+            </div>
             {message && 
                 <Box sx={{
                     background:'rgba(9,167,230,0.8)',

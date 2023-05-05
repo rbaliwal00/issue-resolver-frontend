@@ -15,7 +15,7 @@ import AllIssues from './components/NotLoggedIn/Issues';
 import NotLoggedInIssueComponent from './components/NotLoggedIn/IssueComponent';
 import HomePage from './components/HomePage';
 import AssignedIssues from './components/AssignedIssues';
-// import './App.css';
+import './App.css';
 
 
 const AuthenticatedRoutes = ({children}:any) =>{

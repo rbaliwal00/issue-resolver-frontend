@@ -3,7 +3,7 @@ import { apiClient } from "./AuthenticationApiService";
 
 export const retrieveAllIssuesForUserApi = (id:number) => apiClient.get(`/users/${id}/issues`);
 
-export const retrieveAllIssues = (page: number) => apiClient.get(`/issues?pageNumber=${page}`);
+export const retrieveAllIssues = (page: number, keyword: string) => apiClient.get(`/issues?pageNumber=${page}&keyword=${keyword}`);
 
 export const retrieveIssueApi = (userId: number, id: number) => apiClient.get(`/users/${userId}/issues/${id}`);
 

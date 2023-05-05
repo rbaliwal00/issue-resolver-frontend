@@ -3,7 +3,7 @@ import { Box, Button, TextField, Alert } from '@mui/material';
 import {useNavigate} from 'react-router-dom';
 import { useAppDispatch } from '../redux/app/hooks';
 import { apiClient, signUpApiService } from '../api/AuthenticationApiService';
-import { auth } from '../redux/user/userSlice';
+import { auth, saveRole } from '../redux/user/userSlice';
 
 const SignupComponent = () => {
     const [firstName, setFirstName] = useState<string| null>();
@@ -58,6 +58,7 @@ const SignupComponent = () => {
                     }
                 ) 
                 dispatch(auth(true));
+                dispatch(saveRole(res.data.role));
                 setSuccess(true);
                 setFailed(false);
                 navigate(`/welcome`);

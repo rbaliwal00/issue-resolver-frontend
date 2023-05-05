@@ -36,7 +36,7 @@ const Issues = () => {
     },[]);
 
         const refreshIssues = () =>{
-            retrieveAllIssuesForUserApi(user.id)
+            retrieveAllIssuesForUserApi(user?.id)
             .then(res => {
                 console.log();
                 setIssues(res.data);
@@ -76,8 +76,8 @@ const Issues = () => {
 
     return (
         <div className='md:w-10/12 m-auto'>
-            <h1 className='text-4xl text-white font-black'>
-                Things You Want To Do!
+            <h1 className='text-4xl text-gray-800 text-center mt-4 mb-6 font-black'>
+                Issues Created By You!
             </h1>
             {message && 
                 <Box sx={{

@@ -14,6 +14,7 @@ import GenericButton from '../../molecules/GenericButton';
 import CommentBox from '../../molecules/CommentBox';
 import Modal from '@mui/material/Modal';
 import Autocomplete from '@mui/material/Autocomplete';
+import DeleteIcon from '@mui/icons-material/Delete';
 
 interface IssueComponent{
     id: number;
@@ -52,6 +53,7 @@ const IssueComponent = () => {
     const [userFullName, setUserFullName] = useState<any>(JSON.parse(localStorage.getItem('username') || 'null'));
     const [message, setMessgae] = useState<string|null>(null);
     const [assignees, setAssignees] = useState<Assignee[] | []>([]);
+    const [isAssignees, setIsAssignees] = useState(false);
     const [assigneeSelected, setAssigneeSelected] = useState<string | null>("");
     const[content, setContent] = useState("");  
 
@@ -102,11 +104,9 @@ const IssueComponent = () => {
         retrieveAssignees();
     },[]);
 
-
     const retrieveIssue = () =>{
         retrieveIssueNotLoggedIn(id)
         .then((res) => {
-            console.log(res.data)
             setIssue(res.data);
         })
         .catch((error) => {
@@ -126,8 +126,12 @@ const IssueComponent = () => {
     const retrieveAssignees = () =>{
         getAllExpertsApi()
         .then((res) => {
-            console.log(res.data);
             setAssignees(res.data);
+            res.data.forEach((assignee: any)=> {
+                if(assignee.id === user.id){
+                    setIsAssignees(true);
+                }
+            })
         })
         .catch((error) => {
 
@@ -190,11 +194,19 @@ const IssueComponent = () => {
         }
     }
 
+    const handleDeleteIssue = () =>{
+        console.log("deleted issue");   
+    }
+
+    console.log(isAssignees)
+
     return (
         <Box className='w-10/12 m-auto'>
+            
             <Box className='border-b p-2'>
                 <Box className='text-3xl font-bold font-mono'>
                     {issue?.title}
+                    
                     <Box className='bg-green-900 text-white rounded-md'
                         sx={{
                         paddingX:'25px',
@@ -253,8 +265,8 @@ const IssueComponent = () => {
                     <Box sx={{width: '80%'}}>
                         <Box className='py-4'>
                             <span onClick={() => handleClick(issue?.id)}><UpvoteButton value={issue?.votes.length}/></span>
-                            {/* <span className='float-right'><GenericButton text={`Comments ${issue?.comments.length}`}/></span> */}
-                            <span className='float-right'>
+                            <span className='float-right'><GenericButton text={`Comments ${issue?.comments.length}`}/></span>
+                            {/* <span className='float-right'>
                                 <button className='bg-slate-700 font-black font-mono'
                                     style={{paddingLeft:'50px',
                                         paddingRight: '50px',
@@ -264,7 +276,7 @@ const IssueComponent = () => {
                                         borderRadius:'5px'}}
                                         onClick={() => handleCloseIssue(issue?.id)}
                                     >Close issue</button>
-                            </span>
+                            </span> */}
                         </Box>
                         {issue?.comments?.map((comment:any) => (
                             <CommentBox id={issue?.id} user={comment?.user} content={comment?.content}/>
@@ -307,9 +319,45 @@ const IssueComponent = () => {
                             <div>{assignee?.email}</div>
                         ))}
                     </Box>
+                    <Box onClick={handleDeleteIssue} className='' style={{marginTop: '10px'}}>
+                        <DeleteIcon />
+                        Delete Issue
+                    </Box>
                     {/* <Box className='px-2 mt-5'>
                         <Typography sx={{fontWeight:'600'}}>Labels<SettingsOutlinedIcon sx={{float: 'right'}}/></Typography>
                     </Box> */}
+                    <Box className='px-2 mt-5'>
+                    {(isAssignees || user?.id === issue?.user?.id) && issue?.open && <Box>
+                        <Box className='font-black'>
+                            Close Issue if it is completed or resolved.
+                        </Box>
+                        <span className=''>
+                            <button className='bg-slate-700 font-black font-mono'
+                                style={{paddingLeft:'20px',
+                                    paddingRight: '20px',
+                                    paddingTop:'5px',
+                                    paddingBottom: '5px', 
+                                    color:'white', 
+                                    borderRadius:'5px'}}
+                                    onClick={() => handleCloseIssue(issue?.id)}
+                                >Close issue</button>
+                        </span></Box>}
+                        {/* {!issue?.open && <Box>
+                        <Box className='font-bold'>
+                            Reopen issue if needed.
+                        </Box>
+                        <span className=''>
+                            <button className='bg-amber-400 font-black font-mono'
+                                style={{paddingLeft:'20px',
+                                    paddingRight: '20px',
+                                    paddingTop:'5px',
+                                    paddingBottom: '5px', 
+                                    color:'white', 
+                                    borderRadius:'5px'}}
+                                    onClick={() => handleCloseIssue(issue?.id)}
+                                >Reopen issue</button>
+                        </span></Box>} */}
+                    </Box>
                 </Grid>
             </Grid>
             <Modal

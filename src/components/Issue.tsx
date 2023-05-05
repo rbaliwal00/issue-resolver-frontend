@@ -5,6 +5,7 @@ import { useAppSelector } from '../redux/app/hooks';
 
 import { Dayjs } from 'dayjs';
 import TextField from '@mui/material/TextField';
+import { Alert, Snackbar } from '@mui/material';
 
 const Issue = () => {
     const username = useAppSelector((state) => state.user.username);
@@ -60,8 +61,23 @@ const Issue = () => {
         }
     }
 
+    const [open, setOpen] = React.useState(false);
+
+    const handleClose = (event?: React.SyntheticEvent | Event, reason?: string) => {
+        if (reason === 'clickaway') {
+          return;
+        }
+    
+        setOpen(false);
+      };
+
     return (
         <div className='text-center'>
+            <Snackbar open={open} autoHideDuration={2000} onClose={handleClose}>
+                <Alert onClose={handleClose} severity="error" sx={{ width: '100%' }}>
+                    {errorMessage}
+                </Alert>
+            </Snackbar>
             <div style={{paddingBottom:'30px', width:'60%', margin: 'auto', borderRadius: '5px'}} className='bg-slate-100'>
             <h1 className='pt-10 text-3xl font-bold'>Enter Issue Details</h1>
             {errorMessage && <div>{errorMessage}</div>}
@@ -90,6 +106,7 @@ const Issue = () => {
                      color:'white', borderRadius:'5px',width:'200px' }}>Save</button>
             </form>
             </div>
+            
         </div>
     );
 };

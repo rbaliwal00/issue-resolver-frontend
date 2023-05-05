@@ -61,8 +61,8 @@ const AssignedIssues = () => {
 
     return (
         <div className='md:w-10/12 m-auto'>
-            <h1 className='text-4xl text-white font-black'>
-                Things You Want To Do!
+            <h1 className='text-4xl text-gray-800 text-center mt-4 mb-6 font-black'>
+                Issues Assigned to You!
             </h1>
             {message && 
                 <Box sx={{
