@@ -6,14 +6,20 @@ import { useAppSelector } from '../redux/app/hooks';
 import { Dayjs } from 'dayjs';
 import TextField from '@mui/material/TextField';
 import { Alert, Snackbar } from '@mui/material';
+import CircularProgress from '@mui/material/CircularProgress';
+import { Box } from '@mui/system';
 
 const Issue = () => {
     const username = useAppSelector((state) => state.user.username);
     const id:any = useParams();
+    console.log(id.id);
     const [value, setValue] = React.useState<Dayjs | null>(null);   
     const [title, setTitle] = useState('');
     const [description, setDescription] = useState('');
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+    const [isLoading, setIsLoading] = useState(false);
+
     const [user, setUser] = useState<any>(JSON.parse(localStorage.getItem('user-id') || 'null'));
     const navigate = useNavigate();
 
@@ -22,7 +28,7 @@ const Issue = () => {
     }, [id]);
 
     const retrieveIssue = () =>{
-        retrieveIssueApi(user.id, id.id)
+        retrieveIssueApi(user?.id, id.id)
             .then((res) => {
                 console.log(res.data)
                 setDescription(res.data.description);
@@ -34,31 +40,57 @@ const Issue = () => {
 
     const handleSubmit = (event:any) =>{
         event.preventDefault();
+        setIsLoading(true);
         if(description.length < 5){
             return setErrorMessage('Enter at least 5 characters for Description')
         }
 
         const issue = {
-            id: id.id,
+            id: id?.id,
             username: username,
             title: title,
             description: description,
             isOpen: true
         }
 
-        if(id !== -1){
+        if(id.id == -1){
             createIssueApi(user.id,issue)
             .then((res) => {
+                console.log('Creating' + id)
                 navigate('/issues');
             })
             .catch(err => console.log(issue));
+
+            setIsLoading(false);
         }else{
             updateIssueApi(user.id,issue)
             .then((res) => {
+                console.log('Updating' + id.id)
                 navigate('/issues');
             })
-            .catch(err => console.log(issue));
+            .catch(err => {
+                console.log('Updating' + id.id)
+                console.log(issue )
+            });
+
+            setIsLoading(false);
         }
+
+        // if(id !== -1){
+        //     createIssueApi(user?.id,issue)
+        //     .then((res) => {
+        //         console.log('Creating')
+        //         navigate('/issues');
+        //     })
+        //     .catch(err => console.log(issue));
+        // }else{
+        //     updateIssueApi(user.id,issue)
+        //     .then((res) => {
+        //         console.log('Updating')
+        //         navigate('/issues');
+        //     })
+        //     .catch(err => console.log(issue));
+        // }
     }
 
     const [open, setOpen] = React.useState(false);
@@ -73,6 +105,7 @@ const Issue = () => {
 
     return (
         <div className='text-center'>
+            {isLoading ? <Box className='mt-10 mb-10'><CircularProgress color="success" /></Box> : null}
             <Snackbar open={open} autoHideDuration={2000} onClose={handleClose}>
                 <Alert onClose={handleClose} severity="error" sx={{ width: '100%' }}>
                     {errorMessage}
@@ -101,12 +134,14 @@ const Issue = () => {
                         value={description}
                         onChange={(e) => setDescription(e.target.value)}/>
                 </div>
+                
                 <button className='bg-cyan-700' type='submit'
                     style={{paddingLeft:'50px',paddingTop:'8px', paddingRight: '50px', paddingBottom:'8px',
-                     color:'white', borderRadius:'5px',width:'200px' }}>Save</button>
+                     color:'white', borderRadius:'5px',width:'200px' }}>Save
+
+                     </button>
             </form>
             </div>
-            
         </div>
     );
 };

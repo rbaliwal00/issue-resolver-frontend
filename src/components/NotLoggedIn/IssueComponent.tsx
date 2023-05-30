@@ -77,7 +77,7 @@ const IssueComponent = () => {
         navigate(`/issue/-1`)
     }
 
-    const updateTodo = (id:number) =>{
+    const updateTodo = (id:any) =>{
         navigate(`/issue/${id}`)
     }
 
@@ -143,7 +143,7 @@ const IssueComponent = () => {
         return new Date(date[0], date[1], date[2]).toLocaleDateString();
     }
 
-    const handleClick = (id: number) =>{
+    const handleClick = (id: any) =>{
         setUser(JSON.parse(localStorage.getItem('user-id') || 'null'));
         if(!user){
             return;

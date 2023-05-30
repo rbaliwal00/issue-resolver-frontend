@@ -1,34 +1,26 @@
 import { useEffect, useState } from 'react';
-import {useQuery} from 'react-query';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
 import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
-import Skeleton from '@mui/material/Skeleton';
 import Paper from '@mui/material/Paper';
 import { deleteIssueApi, retrieveAllIssues, retrieveAllIssuesForUserApi } from '../../api/IssueApiService';
 import { Button, Box } from '@mui/material';
 import { useAppDispatch, useAppSelector } from '../../redux/app/hooks';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { settingIssueId } from '../../redux/issue/issueSlice';
-import InfiniteScroll from 'react-infinite-scroll-component'
 import { createTheme, ThemeProvider, styled } from '@mui/material/styles';
-import Pagination from '@mui/material/Pagination';
-import PaginationItem from '@mui/material/PaginationItem';
-import Stack from '@mui/material/Stack';
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 
-interface Issue{
+import Pagination from '@mui/material/Pagination';
+import { retrieveAllCommunities } from '../../api/CommunityApiService';
+
+interface Community{
     id: number;
-    title: string
-    user: any;
-    description: string;
-    dateCreated: Date;
-    isOpen: boolean;
-    username: string;
+    name: string
+    admin: any;
+    members: number;
 }
 
 const theme = createTheme({
@@ -48,16 +40,13 @@ const theme = createTheme({
     },
   });
 
-const Issues = () => {
+const DirectoryTable = () => {
     const username = useAppSelector((state) => state.user.username);
     const [user, setUser] = useState<any>(JSON.parse(localStorage.getItem('user-id') || 'null'));
-    const [issues, setIssues] = useState<Issue[] | []>([]);
+    const [communities, setCommunities] = useState<Community[] | []>([]);
     const [message, setMessgae] = useState<string|null>(null);
-    const [loading, setLoading] = useState(true);
     const [page, setPage] = useState(0);
     const [numberOfPages, setNumberOfPages] = useState(5);
-
-
 
     const [query, setQuery] = useState("");
 
@@ -70,8 +59,6 @@ const Issues = () => {
         pageNumber: 0
     });
 
-    console.log(issueContent);
-
     const numbers = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
 
     const [currentPage, setCurrentPage] = useState(0)
@@ -80,13 +67,13 @@ const Issues = () => {
     const dispatch = useAppDispatch();
 
     useEffect(() => {
-        refreshIssues();
+        refreshCommunities();
     },[page, query]);
 
-    const refreshIssues = () =>{
-        retrieveAllIssues(page, query)
+    const refreshCommunities = () =>{
+        retrieveAllCommunities(page, query)
         .then(res => {
-            setIssues(res.data.content);
+            setCommunities(res.data.content);
             setNumberOfPages(res.data.totalPage)
             setIssueContent({
                 content: [],
@@ -96,12 +83,11 @@ const Issues = () => {
                 lastPage: res.data.lastPage,
                 pageNumber: res.data.pageNumber
             })
-            setLoading(false);
         })
         .catch(error => console.log(error));
-
-        
     }
+
+    console.log(communities);
 
     const deleteTodo = (id:number) =>{
         console.log(id);
@@ -129,21 +115,17 @@ const Issues = () => {
 
     const handleClick = (id: number) =>{
         dispatch(dispatch(settingIssueId(id)));
-        navigate(`/not-logged-in-component/${id}`);
+        navigate(`/community-component/${id}`);
     }
 
     const handleChange = (event: React.ChangeEvent<unknown>, value: number) => {
         setPage(value-1);
       };
 
-
     return (
         <Box>
-            <div className='md:w-10/12 m-auto '>
-                <h1 className='text-4xl text-gray-800 text-center mt-4 mb-6 font-black'>
-                    All Issues
-                </h1>
-            <div className="filter mt-10 mb-10">
+            <div className=''>
+            <div className="filter mt-2 mb-10">
                 <div className="hidden md:block">
                     <div className="md:w-2/3 shadow-lg  mx-auto flex flex-wrap items-stretch  border-0 md:border-2 border-neutral-300 rounded-lg">
                         <div className="md:w-9/12">          
@@ -176,62 +158,50 @@ const Issues = () => {
                     <Table sx={{ minWidth: 650 }} aria-label="simple table" >
                         <TableHead>
                             <TableRow>
-                                <TableCell align="left" sx={{fontWeight:"800", fontSize:'16px', paddingLeft: '30px'}}>Title</TableCell>
-                                <TableCell align="center" sx={{fontWeight:"800", fontSize:'16px'}}>Author</TableCell>
-                                <TableCell align="center" sx={{fontWeight:"800", fontSize:'16px'}}>Date</TableCell>
-                                <TableCell align="center" sx={{fontWeight:"800", fontSize:'16px'}}>Assignees</TableCell>
+                                <TableCell align="left" sx={{fontWeight:"800", fontSize:'16px', paddingLeft: '30px'}}>Name</TableCell>
+                                <TableCell align="center" sx={{fontWeight:"800", fontSize:'16px'}}>Admin</TableCell>
+                                <TableCell align="center" sx={{fontWeight:"800", fontSize:'16px'}}>Members</TableCell>
                             </TableRow>
                         </TableHead>
-    
-                        {loading ?
-                        null
-                      : <TableBody>
-                        {issues?.map((issue:Issue) => (
+                        <TableBody>
+                        {communities?.map((community) => (
                             <TableRow
-                                key={issue?.id}
+                                key={community?.id}
                                 sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
                                 >
                                 {/* <TableCell align="center" component="th" scope="row" sx={{marginLeft:'200px'}}>
                                     {todo.id}s
                                 </TableCell> */}
-                                <TableCell align="left" style={{paddingLeft: '30px', cursor: 'pointer'}} onClick={() => handleClick(issue?.id)}>{issue.title}</TableCell>
-                                <TableCell align='center'>{issue?.username}</TableCell>
-                                <TableCell align='center'>
-                                    {dateFormatter(issue.dateCreated)}
-                                </TableCell>
+                                <TableCell align="left" style={{paddingLeft: '30px', cursor: 'pointer'}} onClick={() => handleClick(community?.id)}>{community?.name}</TableCell>
+                                <TableCell align='center'>{community?.admin?.email}</TableCell>
+                                {/* <TableCell align='center'>
+                                    {dateFormatter(community.dateCreated)}
+                                </TableCell> */}
                                 <TableCell align="center">None</TableCell>
                             </TableRow>
                         ))}
                         </TableBody>
-                        
-                      }
                     </Table>
                 </TableContainer>
-        
-                {loading ? 
-                <Stack spacing={1}>
-                    <Skeleton variant="rectangular" width={'100%'} height={60} />
-                    <Skeleton variant="rectangular" width={'100%'} height={60} />
-                    <Skeleton variant="rectangular" width={'100%'} height={60} />
-                </Stack> : null}
-    
             
             <Button variant="contained" onClick={addNewTodo}  
                 style={{ 
                     backgroundColor : 'teal', 
                     marginTop: '30px', 
-                    marginBottom: '30px'}}>New Issue</Button>
+                    marginBottom: '30px'}}>New Community</Button>
             
         </div>
-        {issues.length !== 0 && <Box className='absolute shadow-lg bottom-0  p-6 bg-white w-10/12'
+        {communities?.length > 0 && <Box className='absolute shadow-lg bottom-0  p-6 bg-white w-10/12'
             style={{left: '0', right: '0', marginLeft: 'auto', marginRight: 'auto'}}>
                 <Box className='w-1/2 m-auto'>
                 <ThemeProvider theme={theme}><Pagination 
-                        count={issueContent?.totalPage} 
+                        count={issueContent.totalPage} 
                         size="large" 
                         shape="rounded"
                         color='primary'
+                        sx={{text:'white', color: 'white'}}
                         onChange={handleChange} 
+                        className='text-white'
                         style={{color: 'white'}}/></ThemeProvider>
                 </Box>
             </Box>}
@@ -239,4 +209,4 @@ const Issues = () => {
     )
 } 
 
-export default Issues;
+export default DirectoryTable;

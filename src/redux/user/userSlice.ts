@@ -7,7 +7,7 @@ interface UserState{
 }
 
 const initialState:UserState = {
-    username: null,
+    username: localStorage.getItem('username'),
     auth: localStorage.getItem('user-details'),
     role: localStorage.getItem('user-role')
 };

@@ -11,6 +11,9 @@ import GenericButton from '../molecules/GenericButton';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAppDispatch } from '../redux/app/hooks';
 import { settingIssueId } from '../redux/issue/issueSlice';
+import MainContent from '../atoms/MainContent';
+import {useQuery} from 'react-query';
+import Skeleton from '@mui/material/Skeleton';
 interface Issue{
     id: number;
     title: string
@@ -44,9 +47,9 @@ const HomePage = () => {
 
     const navigate = useNavigate();
 
-    useEffect(() => {
-        refreshIssues();
-    },[]);
+    // useEffect(() => {
+    //     refreshIssues();
+    // },[]);
 
     const refreshIssues = () =>{
         getHomeIssuesApi()
@@ -57,7 +60,13 @@ const HomePage = () => {
         .catch(error => console.log(error));
     }
 
+    const {isLoading, data, isFetching} = useQuery(
+        'homepage',
+        refreshIssues
+    );
+
     const dateFormatter = (date: any) =>{
+        if(date === undefined) return;
         return new Date(date[0], date[1], date[2]).toLocaleDateString();
     }
 
@@ -94,7 +103,8 @@ const HomePage = () => {
 
     return (
         <ThemeProvider theme={theme}>
-            <Box className='w-11/12 m-auto'>
+            <MainContent />
+            <Box className='w-11/12 m-auto' style={{paddingTop: '20px', paddingBottom: '100px'}}>
                 <Snackbar open={open} autoHideDuration={2000} onClose={handleClose}>
                     <Alert onClose={handleClose} severity="error" sx={{ width: '100%' }}>
                         {message}
@@ -104,6 +114,22 @@ const HomePage = () => {
                     className='pb-4 text-center' 
                     variant='h4' 
                     style={{fontWeight: 'bold', color: ''}}>Top Issues</Typography>
+                    {isLoading && 
+                        <Grid container columnSpacing={2}>
+                        <Grid item xs={7}>
+                            <Skeleton variant="rectangular" width={'100%'} height={300}/>
+                        </Grid>
+                        <Grid item xs={5} spacing={2} >
+                            <Grid item xs={12}minHeight='250px'>
+                            <Skeleton variant="rectangular" width={'100%'} height={300}/>
+                            </Grid>
+                            <Grid item xs={12}minHeight='250px'>
+                            <Skeleton variant="rectangular" width={'100%'} height={300}/>
+                            </Grid>
+                        </Grid>
+                    </Grid>
+
+                    }
                 {issues.length > 0 && <Grid container columnSpacing={2}>
                     <Grid item xs={7} className='border rounded-md' 
                         style={{boxShadow: '0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24)', background: 'white'}}>
@@ -141,7 +167,7 @@ const HomePage = () => {
                         </Box>
                     </Grid>
                     <Grid item xs={5} spacing={2} >
-                        <Grid item xs={12} className='border rounded-md p-2' minHeight='250px' 
+                        {issues[2] && <Grid item xs={12} className='border rounded-md p-2' minHeight='250px' 
                             style={{boxShadow: '0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24)', background: 'white'}}>
                             <Box className='p-2'>
                             <Box className='text-2xl font-bold font-sans text-center mb-4' 
@@ -164,14 +190,14 @@ const HomePage = () => {
                                 </Box>
                                 <Box className='align-text-bottom' sx={{display:'flex',flexDirection: 'column', justifyContent: 'flex-end'}}>
                                     <Box className='pl-2 pb-2' style={{position: 'relative', top: '10px'}}>
-                                        <span onClick={() => handleClick(issues[1].id)}><UpvoteButton value={issues[1].votes.length}/></span>
+                                        <span onClick={() => handleClick(issues[1]?.id)}><UpvoteButton value={issues[1]?.votes.length}/></span>
                                         <span className='float-right'><GenericButton text={`Comments ${issues[1]?.comments.length}`}/></span>
                                     </Box>
                                 </Box>
 
                             </Box>
-                        </Grid>
-                        <Grid item xs={12} className='border rounded-md' minHeight='250px'
+                        </Grid>}
+                        {issues[2] && <Grid item xs={12} className='border rounded-md' minHeight='250px'
                             style={{boxShadow: '0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24)',background: 'white', marginTop: '10px'}}>
                             <Box className='p-2'>
                                 <Box className='text-2xl font-bold font-sans text-center mt-2 mb-4' 
@@ -194,13 +220,13 @@ const HomePage = () => {
                                 </Box>
                                 <Box className='align-text-bottom' sx={{display:'flex',flexDirection: 'column', justifyContent: 'flex-end'}}>
                                     <Box className='pb-4' style={{position: 'relative', top: '10px'}}>
-                                        <span onClick={() => handleClick(issues[2].id)}><UpvoteButton value={issues[2].votes.length}/></span>
+                                        <span onClick={() => handleClick(issues[2]?.id)}><UpvoteButton value={issues[2]?.votes.length}/></span>
                                         <span className='float-right'><GenericButton text={`Comments ${issues[2]?.comments.length}`} /></span>
                                     </Box>
                                 </Box>
 
                             </Box>
-                        </Grid>
+                        </Grid>}
                     </Grid>
                 </Grid>}
       

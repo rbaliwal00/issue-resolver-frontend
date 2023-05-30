@@ -16,6 +16,9 @@ import NotLoggedInIssueComponent from './components/NotLoggedIn/IssueComponent';
 import HomePage from './components/HomePage';
 import AssignedIssues from './components/AssignedIssues';
 import './App.css';
+import Directory from './components/Directory';
+import CommunityComponent from './components/community/CommunityComponent';
+import SearchThings from './atoms/SearchThings';
 
 
 const AuthenticatedRoutes = ({children}:any) =>{
@@ -49,13 +52,18 @@ function App() {
                         <Route path='/login' element={<LoginComponent />}/>
                         <Route path='/signup' element={<SignupComponent />}/>
                         <Route path='/welcome' element={<HomePage/>}/>
+                        <Route path='/directory' element={<Directory/>}/>
                         <Route path='/issuecomponent/:id' element={<IssueComponent/>}/>
                         <Route path='/not-logged-in-component/:id' element={<NotLoggedInIssueComponent/>}/>
                         {/* <Route path='/issue/:id' element={<Issue/>}/> */}
                         <Route path='/issues' element={<Issues/>}/>
                         <Route path='/all-issues' element={<AllIssues/>}/>
+                        <Route path='/community-component/:id' element={<CommunityComponent/>}/>
                         <Route path='/assigned-issues' element={
                             <AuthenticatedRoutes><AssignedIssues /></AuthenticatedRoutes>
+                        }/>
+                        <Route path='/manage-members' element={
+                            <AuthenticatedRoutes><SearchThings /></AuthenticatedRoutes>
                         }/>
                         <Route path='/logout' element={
                             <LogoutComponent/>}/>

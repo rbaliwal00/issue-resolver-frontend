@@ -1,8 +1,8 @@
 import axios from "axios";
 
 export const apiClient = axios.create({
-    baseURL: 'http://localhost:8080'
-    // baseURL: 'http://taskplanner-env-1.eba-2rk7cppb.us-east-1.elasticbeanstalk.com'
+        baseURL: 'http://localhost:8080'
+    // baseURL: 'http://139.59.6.249:8080/'
 })
 
 export const loginApiService = 

@@ -60,7 +60,7 @@ const IssueComponent = () => {
         navigate(`/issue/-1`)
     }
 
-    const updateTodo = (id:number) =>{
+    const updateTodo = (id:any) =>{
         navigate(`/issue/${id}`)
     }
 
@@ -225,7 +225,7 @@ const IssueComponent = () => {
                     </Box>
                     <Box sx={{width: '80%'}}>
                         <Box className='py-4'>
-                            <span onClick={() => handleClick(issue?.id)}><UpvoteButton value={issue?.votes.length}/></span>
+                            <span onClick={() => handleClick()}><UpvoteButton value={issue?.votes.length}/></span>
                             <span className='float-right'><GenericButton text={`Comments ${issue?.comments.length}`}/></span>
                         </Box>
                         

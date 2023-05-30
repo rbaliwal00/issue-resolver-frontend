@@ -8,13 +8,15 @@ interface ButtonProps{
 const GenericButton = ({text}: ButtonProps) => {
     return (
         <span 
-            className='bg-cyan-700' 
+            className='bg-cyan-700 hover:bg-cyan-600' 
             style={{paddingLeft:'50px',
                 paddingRight: '50px',
                 paddingTop:'8px',
                 paddingBottom: '8px', 
                 color:'white', 
-                borderRadius:'5px'}}>
+                borderRadius:'5px',
+                cursor: 'pointer'
+                }}>
             {text}
         </span>
     );

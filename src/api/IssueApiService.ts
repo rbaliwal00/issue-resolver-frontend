@@ -1,4 +1,3 @@
-import axios from "axios"
 import { apiClient } from "./AuthenticationApiService";
 
 export const retrieveAllIssuesForUserApi = (id:number) => apiClient.get(`/users/${id}/issues`);
@@ -9,7 +8,7 @@ export const retrieveIssueApi = (userId: number, id: number) => apiClient.get(`/
 
 export const retrieveIssueNotLoggedIn = (id: number) => apiClient.get(`/issues/${id}`);
 
-export const updateIssueApi = (userId: number, todo:any) => apiClient.put(`/users/${userId}/todos`,todo);
+export const updateIssueApi = (userId: number, issue:any) => apiClient.put(`/users/${userId}/issues`,issue);
 
 export const deleteIssueApi = (userId: number, id: number) => apiClient.delete(`/users/${userId}/todos/${id}`);
 

@@ -22,10 +22,10 @@ const LogoutComponent = () => {
       }, [redirectCounter]);
 
       const handleLogoutClick = () => {
-        setRedirectCounter(7);
-        setTimeout(() => {
-          navigate('/welcome')
-        },7000) 
+        // setRedirectCounter(7);
+        // setTimeout(() => {
+        //   navigate('/welcome')
+        // },7000) 
       };
       useEffect(() => {
         handleLogoutClick(); // Call handleLogoutClick as soon as the component is loaded
