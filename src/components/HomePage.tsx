@@ -47,9 +47,9 @@ const HomePage = () => {
 
     const navigate = useNavigate();
 
-    // useEffect(() => {
-    //     refreshIssues();
-    // },[]);
+    useEffect(() => {
+        refreshIssues();
+    },[]);
 
     const refreshIssues = () =>{
         getHomeIssuesApi()
