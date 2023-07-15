@@ -19,6 +19,8 @@ import './App.css';
 import Directory from './components/Directory';
 import CommunityComponent from './components/community/CommunityComponent';
 import SearchThings from './atoms/SearchThings';
+import ManageMembers from './components/community/ManageMembers';
+import Community from './components/community/Community';
 
 
 const AuthenticatedRoutes = ({children}:any) =>{
@@ -62,13 +64,16 @@ function App() {
                         <Route path='/assigned-issues' element={
                             <AuthenticatedRoutes><AssignedIssues /></AuthenticatedRoutes>
                         }/>
-                        <Route path='/manage-members' element={
-                            <AuthenticatedRoutes><SearchThings /></AuthenticatedRoutes>
+                        <Route path='/community/:id/manage-members' element={
+                            <AuthenticatedRoutes><ManageMembers /></AuthenticatedRoutes>
                         }/>
                         <Route path='/logout' element={
                             <LogoutComponent/>}/>
                         <Route path='/issue/:id' element={
                             <AuthenticatedRoutes><Issue/></AuthenticatedRoutes>
+                        }/>
+                        <Route path='/community/:id' element={
+                            <AuthenticatedRoutes><Community/></AuthenticatedRoutes>
                         }/>
                         <Route path='*' element={<ErrorComponent />}/>
                     </Routes>

@@ -8,7 +8,7 @@ const CommentBox = ({id, user, content}: CommentBoxProps) => {
             <Box className='pl-3 p-1 border bg-sky-100 font-semibold'>
                 <span style={{marginLeft:'10px'}}>{user?.firstName.toLowerCase()} {user?.lastName.toLowerCase()}</span></Box>
             <Box>
-                <Box className='p-3 bg-slate-50'>{content}</Box>
+                <Box className='p-3 bg-white '>{content}</Box>
             </Box>
         </Box>
     );

@@ -131,7 +131,8 @@ export default function DrawerAppBar(props: Props) {
           </Typography>
           <Box sx={{ display: { xs: 'none', sm: 'block', fontSize:'18px', fontWeight: '800'},flexGrow: 1 }}>
                 <Link to={`/welcome`} className='tracking-widest mr-10 text-stone-500'>Home</Link>
-                <Link to="/all-issues" className='tracking-widest hover:text-purple text-stone-500'>Issues</Link>
+                <Link to="/all-issues" className='tracking-widest mr-8 hover:text-purple text-stone-500'>Issues</Link>
+                <Link to="/directory" className='tracking-widest hover:text-purple text-stone-500'>Communities</Link>
           </Box>
           <Box sx={{ display: { xs: 'none', sm: 'block', fontSize:'16px', fontWeight: '800'}, mr:'20px'  }}>
                 {isAutherised===false || isAutherised === null ? <Box className='bg-cyan-700' sx={{px:'50px',py:'8px', color:'white', borderRadius:'5px' }}>

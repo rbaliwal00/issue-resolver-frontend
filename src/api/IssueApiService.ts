@@ -1,8 +1,10 @@
 import { apiClient } from "./AuthenticationApiService";
 
-export const retrieveAllIssuesForUserApi = (id:number) => apiClient.get(`/users/${id}/issues`);
+export const retrieveAllIssuesForUserApi = (id:number,page: number, keyword:string) => apiClient.get(`/users/${id}/issues?pageNumber=${page}&keyword=${keyword}`);
 
-export const retrieveAllIssues = (page: number, keyword: string) => apiClient.get(`/issues?pageNumber=${page}&keyword=${keyword}`);
+export const retrieveAllIssuesForCommunityApi = (page: number, keyword:string, communityId: number) => apiClient.get(`/issues/type/community_issues?pageNumber=${page}&keyword=${keyword}&communityId=${communityId}`);
+
+export const retrieveAllIssues = (page: number, keyword: string) => apiClient.get(`/issues/type/issue?pageNumber=${page}&keyword=${keyword}`);
 
 export const retrieveIssueApi = (userId: number, id: number) => apiClient.get(`/users/${userId}/issues/${id}`);
 
@@ -18,7 +20,7 @@ export const getAllExpertsApi = () => apiClient.get(`/experts`);
 
 export const getHomeIssuesApi = () => apiClient.get(`issues/home_issues`);
 
-export const getAssignedIssuesApi = (userId: number) => apiClient.get(`users/${userId}/issues/assigned_issues`);
+export const getAssignedIssuesApi = (userId: number, page: number, keyword: string) => apiClient.get(`users/${userId}/issues/assigned_issues?pageNumber=${page}&keyword=${keyword}`);
 
 export const upvoteApi = (userId: number, issueId:number) => apiClient.post(`/upvote/user/${userId}/issues/${issueId}`);
 

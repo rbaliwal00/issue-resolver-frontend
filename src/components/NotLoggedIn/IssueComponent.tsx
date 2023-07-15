@@ -258,7 +258,7 @@ const IssueComponent = () => {
                 <Grid xs={12} sm={8} className='m-auto mt-8'>
                     <Box>
                         <Box className='font-black text-lg pl-2 mt-6'>Description</Box>
-                        <Box className='border rounded-md p-2' sx={{ m: 1, width: '80%' }}>
+                        <Box className='border rounded-md p-2 bg-white  ' sx={{ m: 1, width: '80%' }}>
                             {issue?.description}
                         </Box>
                     </Box>
@@ -291,7 +291,7 @@ const IssueComponent = () => {
                                 </Box>
                                 <Box>
                                     <TextField rows={2} multiline 
-                                    placeholder='Leave a comment' sx={{ width: '100%' }} 
+                                    placeholder='Leave a comment' sx={{ width: '100%', background: 'white' }} 
                                     value={content} onChange={(e) => setContent(e.target.value)}>
                                     </TextField>
                                     <Box onClick={addComment} 
@@ -319,10 +319,10 @@ const IssueComponent = () => {
                             <div>{assignee?.email}</div>
                         ))}
                     </Box>
-                    <Box onClick={handleDeleteIssue} className='' style={{marginTop: '10px'}}>
+                    {/* <Box onClick={handleDeleteIssue} className='' style={{marginTop: '10px'}}>
                         <DeleteIcon />
                         Delete Issue
-                    </Box>
+                    </Box> */}
                     {/* <Box className='px-2 mt-5'>
                         <Typography sx={{fontWeight:'600'}}>Labels<SettingsOutlinedIcon sx={{float: 'right'}}/></Typography>
                     </Box> */}

@@ -6,21 +6,24 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
-import { deleteIssueApi, retrieveAllIssues, retrieveAllIssuesForUserApi } from '../../api/IssueApiService';
-import { Button, Box } from '@mui/material';
-import { useAppDispatch, useAppSelector } from '../../redux/app/hooks';
-import { useNavigate } from 'react-router-dom';
-import { settingIssueId } from '../../redux/issue/issueSlice';
+import { Box } from '@mui/material';
+useAppDispatch
 import { createTheme, ThemeProvider, styled } from '@mui/material/styles';
+import {
+    Link,
+    useParams,
+  } from "react-router-dom";
 
 import Pagination from '@mui/material/Pagination';
-import { retrieveAllCommunities } from '../../api/CommunityApiService';
+import { adminRemovingUserFromCommunity, allCommunityMembers, retrieveCommuityApi } from '../../../api/CommunityApiService';
+import { useAppDispatch, useAppSelector } from '../../../redux/app/hooks';
+import GenericButton from '../../../molecules/GenericButton';
 
-interface Community{
+interface UserComponent{
     id: number;
-    name: string
-    admin: any;
-    members: number;
+    firstName: string;
+    lastName: string;
+    email: string;
 }
 
 const theme = createTheme({
@@ -40,91 +43,79 @@ const theme = createTheme({
     },
   });
 
-const DirectoryTable = () => {
+const AllMembers = () => {
     const username = useAppSelector((state) => state.user.username);
     const [user, setUser] = useState<any>(JSON.parse(localStorage.getItem('user-id') || 'null'));
-    const [communities, setCommunities] = useState<Community[] | []>([]);
+    const [members, setMembers] = useState<UserComponent[] | []>([]);
+    const [content, setContent] = useState<any>();
     const [message, setMessgae] = useState<string|null>(null);
     const [page, setPage] = useState(0);
     const [numberOfPages, setNumberOfPages] = useState(5);
 
     const [query, setQuery] = useState("");
 
-    const [issueContent, setIssueContent] = useState({
-        content: [],
-        totalPage: 0,
-        totalElements: 0,
-        pageSize: 0,
-        lastPage: false,
-        pageNumber: 0
-    });
+    const [code, setCode] = useState('NON-MEMBER');
+    const { id } = useParams();
 
-    const numbers = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+    const [admin, setAdmin] = useState<number>(-1);
 
-    const [currentPage, setCurrentPage] = useState(0)
 
-    const navigate = useNavigate();
-    const dispatch = useAppDispatch();
+    const [open, setOpen] = useState(false);
+  
+    const handleClose = (event?: React.SyntheticEvent | Event, reason?: string) => {
+      if (reason === 'clickaway') {
+        return;
+      }
+  
+      setOpen(false);
+    };
 
     useEffect(() => {
-        refreshCommunities();
-    },[page, query]);
+        retrieveCommunity();
+        retrieveMembers();
+    },[page,query]);
 
-    const refreshCommunities = () =>{
-        retrieveAllCommunities(page, query)
-        .then(res => {
-            setCommunities(res.data.content);
-            setNumberOfPages(res.data.totalPage)
-            setIssueContent({
-                content: [],
-                totalPage: res.data.totalPages,
-                totalElements: res.data.totalElements,
-                pageSize: res.data.pageSize,
-                lastPage: res.data.lastPage,
-                pageNumber: res.data.pageNumber
-            })
-        })
-        .catch(error => console.log(error));
-    }
-
-    console.log(communities);
-
-    const deleteTodo = (id:number) =>{
-        console.log(id);
-        deleteIssueApi(user.id, id)
+    const retrieveMembers = () =>{
+        allCommunityMembers(page,query ,Number(id))
         .then((res) => {
-            setMessgae(`Delete of todo with id - ${id} successful`);
-            // refreshTodos();
+            console.log(res.data)
+            setMembers(res.data.content);
+            setContent(res.data);
         })
         .catch((error) => {
-
+            console.log(error)
         })
     }
 
-    const updateTodo = (id:number) =>{
-        navigate(`/community/${id}`)
-    }
-
-    const addNewTodo = () =>{
-        navigate(`/community/-1`)
-    }
-
-    const dateFormatter = (date: any) =>{
-        return new Date(date[0], date[1], date[2]).toLocaleDateString();
-    }
-
-    const handleClick = (id: number) =>{
-        dispatch(dispatch(settingIssueId(id)));
-        navigate(`/community-component/${id}`);
+    const retrieveCommunity = () =>{
+        retrieveCommuityApi(Number(id))
+            .then((res) => {
+                setAdmin(res.data.admin.id);
+                console.log(res.data)
+                console.log(admin)
+            }).catch(err => {
+                console.log(err)
+            });
     }
 
     const handleChange = (event: React.ChangeEvent<unknown>, value: number) => {
         setPage(value-1);
       };
 
+    const handleRemoveMember = (userId: number) =>{
+        const communityId: number = Number(id);
+        adminRemovingUserFromCommunity(communityId, userId, user?.id)
+        .then((res) => {
+            retrieveMembers();
+            console.log(res.data);
+        })
+        .catch((error) => {
+            console.log(error)
+        })
+    }
+
     return (
-        <Box>
-            <div className=''>
+        <div>
             <div className="filter mt-2 mb-10">
                 <div className="hidden md:block">
                     <div className="md:w-2/3 shadow-lg  mx-auto flex flex-wrap items-stretch  border-0 md:border-2 border-neutral-300 rounded-lg">
@@ -154,48 +145,54 @@ const DirectoryTable = () => {
                     marginBottom:'30px',
                     color:'white'}}>{message}</Box>}
 
-            <TableContainer component={Paper} >
+                <TableContainer component={Paper}>
                     <Table sx={{ minWidth: 650 }} aria-label="simple table" >
                         <TableHead>
                             <TableRow>
                                 <TableCell align="left" sx={{fontWeight:"800", fontSize:'16px', paddingLeft: '30px'}}>Name</TableCell>
-                                <TableCell align="center" sx={{fontWeight:"800", fontSize:'16px'}}>Admin</TableCell>
-                                <TableCell align="center" sx={{fontWeight:"800", fontSize:'16px'}}>Members</TableCell>
+                                <TableCell align="center" sx={{fontWeight:"800", fontSize:'16px'}}>Email</TableCell>
+                                {user?.id === admin && 
+                                    <TableCell align="center" 
+                                        sx={{fontWeight:"800", fontSize:'16px'}} 
+                                        >Remove
+                                    </TableCell>}
+                                {user?.id === admin && <TableCell align="center" sx={{fontWeight:"800", fontSize:'16px'}}>Block</TableCell>}
                             </TableRow>
                         </TableHead>
                         <TableBody>
-                        {communities?.map((community) => (
+                        {members?.map((member:any) => (
                             <TableRow
-                                key={community?.id}
+                                key={member?.id}
                                 sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
                                 >
                                 {/* <TableCell align="center" component="th" scope="row" sx={{marginLeft:'200px'}}>
                                     {todo.id}s
                                 </TableCell> */}
-                                <TableCell align="left" style={{paddingLeft: '30px', cursor: 'pointer'}} onClick={() => handleClick(community?.id)}>{community?.name}</TableCell>
-                                <TableCell align='center'>{community?.admin?.email}</TableCell>
+                                <TableCell align="left" style={{paddingLeft: '30px', cursor: 'pointer'}}>{member?.firstName} {member?.lastName}</TableCell>
+                                <TableCell align='center'>{member.email}</TableCell>
                                 {/* <TableCell align='center'>
                                     {dateFormatter(community.dateCreated)}
                                 </TableCell> */}
-                                <TableCell align="center">None</TableCell>
+                                {user?.id === admin && 
+                                    <TableCell 
+                                        align="center" onClick={() => handleRemoveMember(member?.id)}>
+                                            <span>
+                                                <GenericButton 
+                                                    text='REMOVE' 
+                                                    color='#F51720'/>
+                                            </span>
+                                    </TableCell>}
+                                {user?.id === admin && <TableCell align="center"><span><GenericButton text='BLOCK' color='#FBC740'/></span></TableCell>}
                             </TableRow>
                         ))}
                         </TableBody>
                     </Table>
                 </TableContainer>
-            
-            <Button variant="contained" onClick={addNewTodo}  
-                style={{ 
-                    backgroundColor : 'teal', 
-                    marginTop: '30px', 
-                    marginBottom: '30px'}}>New Community</Button>
-            
-        </div>
-        {communities?.length > 0 && <Box className='absolute shadow-lg bottom-0  p-6 bg-white w-10/12'
+                {members?.length > 0 && <Box className='absolute shadow-lg bottom-0  p-6 bg-white w-10/12'
             style={{left: '0', right: '0', marginLeft: 'auto', marginRight: 'auto'}}>
-                <Box className='w-1/2 m-auto'>
+                <Box className='w-1/2 m-auto mt-10'>
                 <ThemeProvider theme={theme}><Pagination 
-                        count={issueContent.totalPage} 
+                        count={content.totalPage} 
                         size="large" 
                         shape="rounded"
                         color='primary'
@@ -205,8 +202,8 @@ const DirectoryTable = () => {
                         style={{color: 'white'}}/></ThemeProvider>
                 </Box>
             </Box>}
-        </Box>
-    )
-} 
+        </div>
+    );
+};
 
-export default DirectoryTable;
+export default AllMembers;

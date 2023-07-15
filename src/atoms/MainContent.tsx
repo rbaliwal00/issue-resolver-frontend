@@ -6,18 +6,18 @@ import GenericButton from '../molecules/GenericButton';
 
 const MainContent = () => {
     return (
-        <Box className='bg-slate-100'>
-            <Box className='w-10/12 m-auto pt-2 ' height="calc(100vh - 100px)">
+        <Box className='bg-slate-100 '>
+            <Box className='w-10/12 m-auto pt-2 h-full lg:h-screen' >
                 <Box className='text-4xl font-black'>Welcome to I-Tracker</Box>
                 <Box className='text-xl font-black mt-12'>Some ideas to get you started</Box>
                 <Stack direction="row" spacing={2} className='mt-6'>
-                    <Box className='w-1/3 bg-white rounded-md p-4' 
+                    <Box className='lg:w-1/3 bg-white rounded-md p-4' 
                         style={{boxShadow: '0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24)'}}>
                         <Typography fontWeight={700}>Create Issue</Typography>
                         <Typography fontWeight={100} className='mt-4'>
                             Having questions or a problems then create an issue to get resolutions.
                         </Typography>
-                        <Box className='pt-4'><GenericButton text='New Issue'/></Box>
+                        <Box className='pt-4'><Link to='/issue/-1'><GenericButton text='New Issue'/></Link></Box>
                     </Box>
                     <Box className='w-1/3 bg-white rounded-md p-4' 
                         style={{boxShadow: '0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24)'}}>

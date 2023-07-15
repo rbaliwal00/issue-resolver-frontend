@@ -1,4 +1,4 @@
-import { Box, Stack, Snackbar, Alert, Grid, Typography } from '@mui/material';
+import { Box, Stack, Snackbar, Alert, Grid, Tab, Tabs, Typography } from '@mui/material';
 import React,{useState, useEffect} from 'react';
 import { retrieveCommuityApi, userRequestingCommunity } from '../../api/CommunityApiService';
 import {
@@ -9,10 +9,11 @@ import {
   import LockIcon from '@mui/icons-material/Lock';
   import VisibilityIcon from '@mui/icons-material/Visibility';
 import GenericButton from '../../molecules/GenericButton';
+import AllIssues from './issues/AllIssues';
 
 interface CommunityComponent{
     id: number;
-    name: string
+    name: string;
     user: any;
     description: string;
     // dateCreated: Date;
@@ -22,6 +23,40 @@ interface CommunityComponent{
     // votes: any;
     requestingUsers: any;
 }
+
+interface TabPanelProps {
+    children?: React.ReactNode;
+    index: number;
+    value: number;
+  }
+
+function TabPanel(props: TabPanelProps) {
+    const { children, value, index, ...other } = props;
+  
+    return (
+      <div
+        role="tabpanel"
+        hidden={value !== index}
+        id={`simple-tabpanel-${index}`}
+        aria-labelledby={`simple-tab-${index}`}
+        {...other}
+      >
+        {value === index && (
+          <Box sx={{ p: 3 }}>
+            <Typography>{children}</Typography>
+          </Box>
+        )}
+      </div>
+    );
+  }
+
+  function a11yProps(index: number) {
+    return {
+      id: `simple-tab-${index}`,
+      'aria-controls': `simple-tabpanel-${index}`,
+    };
+  }
+
 
 
 const CommunityComponent = () => {
@@ -49,7 +84,7 @@ const CommunityComponent = () => {
     const retrieveCommunity = () =>{
         retrieveCommuityApi(Number(id))
         .then((res) => {
-            console.log(res.data.requestingUsers[0].firstName)
+            console.log(res.data.requestingUsers)
             setCommunity(res.data);
             if(res.data?.admin.id === user?.id){
                 setCode('ADMIN');
@@ -81,10 +116,19 @@ const CommunityComponent = () => {
         retrieveCommunity();
     }
 
+    const [value, setValue] = React.useState(0);
+
+    const handleChange = (event: React.SyntheticEvent, newValue: number) => {
+        setValue(newValue);
+    };
+
     return (
         <Box className='w-full lg:w-9/12 m-auto mt-4'>
             <span className='text-3xl'>{community?.name}</span>
-                <Link to="/manage-members" className='float-right'><GenericButton text='Manage Members'/></Link>
+                <Link to={`/community/${id}/manage-members`} className='float-right'><GenericButton text='Members'/></Link>
+                {code === 'ADMIN' && <Link to={`/community/${id}`} className='float-right pr-2'>
+                    <GenericButton text='Edit' color='#484848'/>
+                </Link>}
                 <Snackbar open={open} autoHideDuration={2000} onClose={handleClose}>
                     <Alert onClose={handleClose} severity="error" sx={{ width: '100%' }}>
                         {message}
@@ -113,18 +157,46 @@ const CommunityComponent = () => {
                             <Box className='text-xl font-semibold'>Total Issues: 20</Box>
                             {code === 'NON-MEMBER' && <Box className='mt-16 text-right' onClick={handleClick}><GenericButton text='Join Community'/></Box>}
                             {code === 'REQUESTED' && <Box className='mt-16 text-right'><GenericButton text='REQUESTED'/></Box>}
-                            {code === 'MEMBER' && <Box className='mt-16 text-right'><GenericButton text='MEMBER'/></Box>}
+                            {code === 'MEMBER' && <Box className='mt-16 text-right'>You are the member this community.</Box>}
                             {code === 'ADMIN' && <Box className='mt-16 font-light'>You created this community.</Box>}
                         </Box>
                     </Grid>
                 </Grid> 
                 <Box>
-                    <Typography>Community Requests</Typography>
+ 
+        <Box className='bg-gray shadow-lg'>
+                <Box className='mb-4 mt-4 pt-4 text-center'><span className='text-3xl'>Issues</span></Box>
+                <Box sx={{ borderColor: 'divider' }} className='bg-white shadow-lg'>
+                    <Tabs value={value} onChange={handleChange} aria-label="basic tabs example">
+                    <Tab label="All" {...a11yProps(0)} />
+                    <Tab label="Created By You" {...a11yProps(1)} />
+                    <Tab label="Assigned to You" {...a11yProps(2)} />
+                    <Tab label="Requested" {...a11yProps(3)} />
+                    </Tabs>
+                </Box>
+                <TabPanel value={value} index={0}>
+                    <Box className='mt-4'><AllIssues /></Box>
+                </TabPanel>
+                <TabPanel value={value} index={1}>
+                    {/* <Box className='mt-4'><CreatedCommunity/></Box>  */}
+                </TabPanel> 
+                <TabPanel value={value} index={2}>
+                    {/* {username ? <Box className='mt-4'><JoinedCommunities/></Box> : 
+                        <Box className='mt-4'>Plese login to see communities that you have joined.</Box>
+                    } */}
+                </TabPanel>
+                <TabPanel value={value} index={3}>
+                    {/* {username ? <Box className='mt-4'><RequestedCommunities/></Box> : 
+                        <Box className='mt-4'>Plese login to see communities that you have requested.</Box>
+                    } */}
+                </TabPanel>
+            </Box>
+                    {/* <Typography>Community Requests</Typography>
                     {community?.requestingUsers.map((user: any) => (
                         <div>
                         <div>{user.firstName}</div>
                         </div>
-                    ))}
+                    ))} */}
                 </Box>
         </Box>
     );

@@ -1,24 +1,18 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { createIssueApi, retrieveIssueApi, updateIssueApi } from '../api/IssueApiService';
-import { useAppSelector } from '../redux/app/hooks';
-
 import { Dayjs } from 'dayjs';
 import TextField from '@mui/material/TextField';
 import { Alert, Snackbar } from '@mui/material';
 import CircularProgress from '@mui/material/CircularProgress';
 import { Box } from '@mui/system';
+import { useAppSelector } from '../../redux/app/hooks';
+import { createCommunityApi, retrieveCommuityApi, updateCommunityApi } from '../../api/CommunityApiService';
 
-interface IssueProps{
-    communityId ?: number;
-} 
-
-const Issue = ({communityId}: IssueProps) => {
+const Community = () => {
     const username = useAppSelector((state) => state.user.username);
-    const id:any = useParams();
-    console.log(id.id);
+    const { id } = useParams();
     const [value, setValue] = React.useState<Dayjs | null>(null);   
-    const [title, setTitle] = useState('');
+    const [name, setName] = useState('');
     const [description, setDescription] = useState('');
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
@@ -28,15 +22,15 @@ const Issue = ({communityId}: IssueProps) => {
     const navigate = useNavigate();
 
     useEffect(() => {
-        retrieveIssue();
+        retrieveCommunity();
     }, [id]);
 
-    const retrieveIssue = () =>{
-        retrieveIssueApi(user?.id, id.id)
+    const retrieveCommunity = () =>{
+        retrieveCommuityApi(Number(id))
             .then((res) => {
                 console.log(res.data)
                 setDescription(res.data.description);
-                setTitle(res.data.title);
+                setName(res.data.name);
             }).catch(err => {
                 console.log(err)
             });
@@ -49,55 +43,32 @@ const Issue = ({communityId}: IssueProps) => {
             return setErrorMessage('Enter at least 5 characters for Description')
         }
 
-        const issue = {
-            id: id?.id,
-            username: username,
-            title: title,
-            description: description,
-            isOpen: true,
-            communityId: communityId
+        const community = {
+            name: name,
+            description: description
         }
 
-        if(id.id == -1){
-            console.log(communityId);
-            createIssueApi(user.id,issue)
+        if(Number(id) === -1){
+            createCommunityApi(community)
             .then((res) => {
-                console.log('Creating' + id)
-                navigate('/issues');
+                console.log(res)
+                navigate('/directory');
             })
-            .catch(err => console.log(issue));
+            .catch(err => console.log(err));
 
             setIsLoading(false);
-            
         }else{
-            updateIssueApi(user.id,issue)
+            updateCommunityApi(Number(id), community)
             .then((res) => {
-                console.log('Updating' + id.id)
-                navigate('/issues');
+                console.log(res.data);
+                navigate('/directory');
             })
             .catch(err => {
-                console.log('Updating' + id.id)
-                console.log(issue )
+                console.log(err);
             });
 
             setIsLoading(false);
         }
-
-        // if(id !== -1){
-        //     createIssueApi(user?.id,issue)
-        //     .then((res) => {
-        //         console.log('Creating')
-        //         navigate('/issues');
-        //     })
-        //     .catch(err => console.log(issue));
-        // }else{
-        //     updateIssueApi(user.id,issue)
-        //     .then((res) => {
-        //         console.log('Updating')
-        //         navigate('/issues');
-        //     })
-        //     .catch(err => console.log(issue));
-        // }
     }
 
     const [open, setOpen] = React.useState(false);
@@ -123,15 +94,15 @@ const Issue = ({communityId}: IssueProps) => {
             {errorMessage && <div>{errorMessage}</div>}
             <form onSubmit={handleSubmit}>
                 <div className='mt-10 mb-16'>
-                    <label className='block text-xl font-black text-left ml-11'>Title</label>
+                    <label className='block text-xl font-black text-left ml-11'>Name</label>
                     <input style={{width: "90%", 
                         margin: "auto", 
                         paddingTop: "10px", 
                         border: '1px solid black',
                         padding: "10px", 
                         borderRadius: "3px"}}
-                        value={title}
-                        onChange={(e) => setTitle(e.target.value)}/>
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}/>
                 </div>
                 <div className='mt-10 mb-6'>
                     <label className='block text-xl font-black text-left ml-11'>Description</label>
@@ -145,11 +116,12 @@ const Issue = ({communityId}: IssueProps) => {
                 <button className='bg-cyan-700' type='submit'
                     style={{paddingLeft:'50px',paddingTop:'8px', paddingRight: '50px', paddingBottom:'8px',
                      color:'white', borderRadius:'5px',width:'200px' }}>Save
-                </button>
+
+                     </button>
             </form>
             </div>
         </div>
     );
 };
 
-export default Issue;
+export default Community;

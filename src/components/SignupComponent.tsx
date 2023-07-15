@@ -74,7 +74,7 @@ const SignupComponent = () => {
 
     return (
       <div>
-        <div style={{paddingBottom:'30px', width:'40%', margin: 'auto', borderRadius: '5px'}} className='bg-slate-200 text-center'>
+        <div style={{paddingBottom:'30px', width:'40%', margin: 'auto', borderRadius: '5px'}} className='bg-gray-200 text-center'>
         <h1 className='font-serif text-3xl tracking-wider font-bold pt-4'>Get Started Here</h1>
         <form onSubmit={handleSumbit}>
             <Box sx={{mt:'50px', mb:'30px'}} className='px-10'>

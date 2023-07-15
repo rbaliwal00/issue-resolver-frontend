@@ -3,9 +3,10 @@ import React from 'react';
 
 interface ButtonProps{
     text: string;
+    color ?: string;
 }
 
-const GenericButton = ({text}: ButtonProps) => {
+const GenericButton = ({text, color}: ButtonProps) => {
     return (
         <span 
             className='bg-cyan-700 hover:bg-cyan-600' 
@@ -15,7 +16,8 @@ const GenericButton = ({text}: ButtonProps) => {
                 paddingBottom: '8px', 
                 color:'white', 
                 borderRadius:'5px',
-                cursor: 'pointer'
+                cursor: 'pointer',
+                background: `${color}`
                 }}>
             {text}
         </span>

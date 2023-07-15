@@ -2,8 +2,20 @@ import axios from "axios";
 
 export const apiClient = axios.create({
         baseURL: 'http://localhost:8080'
-    // baseURL: 'http://139.59.6.249:8080/'
+    // baseURL: 'https://apis.issuetracker.live'
 })
+
+
+apiClient.interceptors.response.use((response) => {
+    return response;
+}, 
+    async (error) =>{
+        console.log(error)
+        if(error === 'JWT Expired'){
+            window.location.href = "/logout"
+        }
+    }    
+)
 
 export const loginApiService = 
     (email:string, password: string) => apiClient.post(`/api/v1/auth/authenticate`,{email, password});

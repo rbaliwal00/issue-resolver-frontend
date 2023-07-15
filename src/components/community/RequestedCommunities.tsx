@@ -124,7 +124,7 @@ const RequestedCommunities = () => {
       };
     return (
         <Box>
-        <div className=''>
+        {communities.length > 0 ? <div className=''>
         <div className="filter mt-2 mb-10">
             <div className="hidden md:block">
                 <div className="md:w-2/3 shadow-lg  mx-auto flex flex-wrap items-stretch  border-0 md:border-2 border-neutral-300 rounded-lg">
@@ -190,7 +190,7 @@ const RequestedCommunities = () => {
                 marginTop: '30px', 
                 marginBottom: '30px'}}>New Community</Button>
         
-    </div>
+    </div> : <div> You haven't requested to join any community yet.</div>}
     {communities?.length > 0 && <Box className='absolute shadow-lg bottom-0  p-6 bg-white w-10/12'
         style={{left: '0', right: '0', marginLeft: 'auto', marginRight: 'auto'}}>
             <Box className='w-1/2 m-auto'>

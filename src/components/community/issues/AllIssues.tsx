@@ -8,11 +8,8 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Skeleton from '@mui/material/Skeleton';
 import Paper from '@mui/material/Paper';
-import { deleteIssueApi, retrieveAllIssues, retrieveAllIssuesForUserApi } from '../api/IssueApiService';
 import { Button, Box } from '@mui/material';
-import { useAppDispatch, useAppSelector } from '../redux/app/hooks';
-import { Link, useNavigate } from 'react-router-dom';
-import { settingIssueId } from '../redux/issue/issueSlice';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import InfiniteScroll from 'react-infinite-scroll-component'
 import { createTheme, ThemeProvider, styled } from '@mui/material/styles';
 import Pagination from '@mui/material/Pagination';
@@ -20,6 +17,9 @@ import PaginationItem from '@mui/material/PaginationItem';
 import Stack from '@mui/material/Stack';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
+import { settingIssueId } from '../../../redux/issue/issueSlice';
+import { useAppDispatch, useAppSelector } from '../../../redux/app/hooks';
+import { deleteIssueApi, retrieveAllIssuesForCommunityApi, retrieveAllIssuesForUserApi } from '../../../api/IssueApiService';
 
 interface Issue{
     id: number;
@@ -48,7 +48,7 @@ const theme = createTheme({
     },
   });
 
-const Issues = () => {
+const AllIssues = () => {
     const username = useAppSelector((state) => state.user.username);
     const [user, setUser] = useState<any>(JSON.parse(localStorage.getItem('user-id') || 'null'));
     const [issues, setIssues] = useState<Issue[] | []>([]);
@@ -58,7 +58,7 @@ const Issues = () => {
     const [page, setPage] = useState(0);
     const [numberOfPages, setNumberOfPages] = useState(5);
 
-
+    const { id } = useParams();
 
     const [query, setQuery] = useState("");
 
@@ -79,7 +79,7 @@ const Issues = () => {
     },[page, query]);
 
         const refreshIssues = () =>{
-            retrieveAllIssuesForUserApi(user?.id,page, query)
+            retrieveAllIssuesForCommunityApi(page, query, id)
             .then(res => {
                 setIssues(res.data.content);
                 setNumberOfPages(res.data.totalPage)
@@ -121,8 +121,7 @@ const Issues = () => {
     }
 
     const handleClick = (id: number) =>{
-        dispatch(dispatch(settingIssueId(id)));
-        navigate(`/issuecomponent/${id}`);
+        navigate(`/not-logged-in-component/${id}`);
     }
 
     const handleChange = (event: React.ChangeEvent<unknown>, value: number) => {
@@ -133,10 +132,10 @@ const Issues = () => {
     return (
         <Box>
             <div className='md:w-10/12 m-auto '>
-                <h1 className='text-4xl text-gray-800 text-center mt-4 mb-6 font-black'>
+                <h1 className='text-2xl text-gray-800 text-center font-black'>
                     All Issues
                 </h1>
-            <div className="filter mt-10 mb-10">
+            <div className="filter mt-2 mb-4">
                 <div className="hidden md:block">
                     <div className="md:w-2/3 shadow-lg  mx-auto flex flex-wrap items-stretch  border-0 md:border-2 border-neutral-300 rounded-lg">
                         <div className="md:w-9/12">          
@@ -216,7 +215,7 @@ const Issues = () => {
                     marginBottom: '30px'}}>New Issue</Button>
             
         </div>
-        {issues.length !== 0 && <Box className='absolute shadow-lg bottom-0  p-6 bg-white w-10/12'
+        {issues.length !== 0 && <Box className='shadow-lg bottom-0  p-6 bg-white w-10/12'
             style={{left: '0', right: '0', marginLeft: 'auto', marginRight: 'auto'}}>
                 <Box className='w-1/2 m-auto'>
                 <ThemeProvider theme={theme}><Pagination 
@@ -232,4 +231,4 @@ const Issues = () => {
     )
 } 
 
-export default Issues;
+export default AllIssues;
